@@ -1,254 +1,492 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>SidraFly — Prototype</title>
+
+<!-- Playfair Display for heading -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
 <style>
 :root{
-  --bg-900: #06121a;
-  --panel: #0f1724;
-  --muted: #9aa3b2;
-  --text: #ffffff;
-  --accent: #ff7a00;
+  --bg-900:#06121a;
+  --panel: rgba(255,255,255,0.06);
+  --muted:#9aa3b2;
+  --text:#ffffff;
+  --accent:#ff7a00;
   --accent-2:#ff9a33;
-  --glass: rgba(255,255,255,0.03);
-  --card-radius: 12px;
-  --gap: 14px;
-  --shadow: 0 10px 30px rgba(3,6,23,0.6);
-  --font: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --soft-gold:#d4af37;
+  --calm-blue-rgb:77,166,255; /* #4da6ff */
+  --heading-blue-shadow: rgba(0,122,255,0.4);
+  --heading-blue-spread: 18px; /* user requested 18px, opacity 0.4 */
+  --glass-bg: rgba(255,255,255,0.06);
+  --confirm-green: #90EE90;
+  --cancel-red: #ffb6b6;
+  --font-main: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
-*{box-sizing:border-box;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
 body{
-  margin:0;
-  font-family:var(--font);
-  background:linear-gradient(180deg,var(--bg-900),#04101a 140%);
+  font-family:var(--font-main);
+  background: linear-gradient(180deg,var(--bg-900),#04101a 140%);
   color:var(--text);
-  transition: background 0.6s, color 0.6s;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
   overflow-x:hidden;
-}
-body.light{
-  background: linear-gradient(180deg,#e0e5ec,#cfd8e4 140%);
-  color:#111;
+  transition:background .35s ease, color .35s ease;
 }
 
-/* Clouds */
-.cloud{
-  position: absolute;
-  width: 150px;
-  opacity: 0.15;
-  animation: floatCloud 60s linear infinite;
+/* Top controls: DAY/NIGHT toggle then HAMBURGER to the right */
+.top-controls{
+  position:fixed; top:14px; right:14px; display:flex; gap:10px; z-index:60; align-items:center;
 }
-.cloud:nth-child(1){top:10%; animation-delay:0s;}
-.cloud:nth-child(2){top:40%; animation-delay:3s;}
-
-@keyframes floatCloud{
-  0%{left:-200px;}
-  100%{left:100%;}
-}
-
-/* Theme Toggle */
+/* Day/night toggle (left) */
 #themeToggle{
-  position: fixed; top:18px; right:22px;
-  width:32px; height:32px;
-  display:flex; justify-content:center; align-items:center;
-  font-size:16px; cursor:pointer;
-  background: rgba(255,255,255,0.1);
-  border-radius:50%;
-  border:1px solid rgba(255,255,255,0.15);
-  z-index:10;
+  width:36px; height:36px; display:flex; align-items:center; justify-content:center;
+  border-radius:8px; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08);
+  cursor:pointer; font-size:18px; color: var(--accent);
+}
+/* Hamburger (to the right of the toggle) */
+#menuToggle{
+  width:36px; height:36px; display:flex; align-items:center; justify-content:center;
+  border-radius:8px; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08);
+  cursor:pointer; font-size:18px; color:var(--accent);
 }
 
-/* Wrapper */
+/* Main column */
 .wrap{
-  max-width:400px;
-  margin:80px auto 120px auto;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:20px;
-  position:relative;
-  z-index:1;
+  max-width:420px; margin:80px auto 120px; display:flex; flex-direction:column; align-items:center; gap:12px;
+  padding:0 18px; position:relative; z-index:10;
 }
-.brand{
-  display:flex; flex-direction:column; align-items:center; gap:12px;
-}
+
+/* Brand */
+.brand{ display:flex; flex-direction:column; align-items:center; gap:6px; }
 .logo{
   width:72px; height:72px; border-radius:12px;
-  box-shadow:0 6px 16px rgba(255,122,0,0.12);
+  box-shadow: 0 0 20px rgba(0,122,255,0.56);
 }
-.logo img{width:100%;height:100%;object-fit:contain;border-radius:12px;}
+.logo img{ width:100%; height:100%; object-fit:contain; border-radius:12px; }
+
+/* Welcome heading — Playfair Display, soft orange, blue back shadow (18px, 0.4) */
 .brand h1{
+  font-family: 'Playfair Display', serif;
   font-size:2rem;
-  margin:0;
-  color: var(--accent);
-  font-weight:900;
-}
-.brand p{
-  color:var(--muted);
-  font-size:1.1rem;
-  text-align:center;
-  max-width:300px;
-  line-height:1.3rem;
+  margin:12px 0 4px 0;
+  color:#ff9a33;
+  text-shadow: 0 0 var(--heading-blue-spread) var(--heading-blue-shadow);
+  font-weight:700;
+  line-height:1.05;
 }
 
-/* Vertical Options */
+/* Slogan — soft gold, italic; keep short distance to heading, but larger space below before the booking buttons */
+.brand p{
+  color:var(--soft-gold);
+  font-size:1.05rem;
+  font-style:italic;
+  text-align:center;
+  max-width:340px;
+  margin-top:2px;
+  margin-bottom:22px; /* breathing space between slogan and booking buttons */
+}
+
+/* Booking buttons — horizontal, correct order left->right */
 .options{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
   width:100%;
+  display:flex;
+  flex-direction: column; /* stack vertically */
+  gap:12px;
+  justify-content:flex-start; /* aligns buttons at the top */
+  align-items: stretch;       /* makes buttons full width */
 }
 .option-btn{
-  padding:14px;
+  flex:1;
+  padding:12px 10px;
   border-radius:12px;
   border:none;
   cursor:pointer;
-  font-weight:600;
+  font-weight:700;
+  color:#fff;
   background: linear-gradient(90deg,var(--accent),var(--accent-2));
-  color:#fff;
   text-align:center;
-  font-size:1rem;
-  box-shadow:0 8px 20px rgba(255,122,0,0.15);
-  transition: transform 0.2s ease;
+  font-size:0.95rem;
+  box-shadow: 0 0 14px rgba(77,166,255,0.45);
+  transition: transform 180ms ease, box-shadow 180ms ease;
 }
-.option-btn:hover{transform:translateY(-2px);}
-
-/* Cards area */
-.cards{display:grid;gap:12px;margin-top:16px;}
-.flight{
-  display:flex;justify-content:space-between;align-items:center;
-  border:1px solid rgba(255,255,255,0.02);
-  padding:12px; border-radius:12px;
+.option-btn:hover{
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 18px rgba(77,166,255,0.55);
 }
-.col{display:flex;flex-direction:column;gap:6px;}
-.route{font-weight:700;}
-.time{color:var(--muted);font-size:0.9rem;}
-.price{font-weight:800;color:var(--accent);font-size:1.1rem;}
-.select{background:transparent;border:1px solid rgba(255,255,255,0.3);padding:4px 10px;border-radius:6px;}
-.select.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;}
 
-/* Bottom Nav */
+/* Bottom nav */
 .bottom-nav{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  background: rgba(0,0,0,0.5);
-  display:flex;
-  justify-content:space-around;
-  padding:10px 0;
-  backdrop-filter:blur(6px);
+  position:fixed; bottom:0; left:0; width:100%;
+  background: rgba(0,0,0,0.45); display:flex; justify-content:space-around;
+  padding:10px 0; backdrop-filter: blur(6px); z-index:20;
 }
-.nav-item{
-  display:flex; flex-direction:column; align-items:center;
-  color:#fff;
-  font-size:1rem;
-  cursor:pointer;
-}
-.nav-item span{margin-top:2px;font-size:0.85rem;}
+.nav-item{ display:flex; flex-direction:column; align-items:center; color:#fff; font-size:1rem; cursor:pointer; }
+.nav-item span{ font-size:0.82rem; margin-top:4px; }
 
-/* Popup Calendar */
+/* Overlay + modal (dim, soft black glass) */
+.overlay{
+  position:fixed; inset:0; background: rgba(0,0,0,0.45); backdrop-filter: blur(8px); display:none;
+  align-items:center; justify-content:center; z-index:70; transition: opacity .25s ease;
+}
+.overlay.show{ display:flex; }
+
+/* Modal card */
 .modal{
-  display:none;
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%, -50%);
-  background: var(--panel);
-  padding:20px;
-  border-radius:12px;
-  z-index:20;
-  text-align:center;
+  width:92%; max-width:520px; background: rgba(0,0,0,0.65); padding:20px; border-radius:14px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.6); color:#fff; transform: translateY(14px); opacity:0;
+  transition: transform .28s cubic-bezier(.2,.9,.2,1), opacity .28s ease;
+  border:1px solid rgba(255,255,255,0.04);
 }
-.modal input[type="date"]{
-  padding:6px;
-  font-size:1rem;
-  border-radius:6px;
-  border:none;
+.overlay.show .modal{ transform: translateY(0); opacity:1; }
+
+/* Modal content styles */
+.modal .hdr{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.modal .hdr h3{ margin:0; font-size:1.1rem; font-weight:700; color:var(--accent); }
+.modal .hdr .close-btn{ background:transparent; border:none; color:#fff; font-size:22px; cursor:pointer; }
+
+/* Form rows */
+.form-row{ display:flex; flex-direction:column; gap:8px; margin:8px 0; }
+.form-row.inline{ flex-direction:row; gap:12px; align-items:center; }
+label{ font-size:0.9rem; color:var(--muted); }
+
+/* inputs/selects */
+select, input[type="number"], input[type="date"], input[type="text"]{
+  width:100%; padding:10px 12px; border-radius:10px; border:none; background: rgba(255,255,255,0.03);
+  color:var(--text); font-size:0.95rem; outline:none; border:1px solid rgba(255,255,255,0.03);
 }
-.modal .modal-buttons{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  margin-top:12px;
+select.small{ max-width:140px; }
+
+/* focus aura */
+select:focus, input:focus{
+  box-shadow: 0 0 14px rgba(77,166,255,0.45);
+  transform: translateY(-1px);
 }
-.modal button{
-  padding:8px 16px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  font-weight:600;
+
+/* ticket radios row */
+.ticket-row{ display:flex; gap:12px; align-items:center; }
+
+/* modal buttons */
+.modal .modal-buttons{ display:flex; gap:12px; justify-content:flex-end; margin-top:12px; }
+.btn{ padding:10px 14px; border-radius:8px; border:none; cursor:pointer; font-weight:700; }
+.btn-confirm{ background: var(--confirm-green); color:#035703; box-shadow: 0 6px 18px rgba(0,122,255,0.18); }
+.btn-cancel{ background: var(--cancel-red); color:#6b0000; box-shadow: 0 6px 18px rgba(0,122,255,0.12); }
+
+/* Mini popup (custom baggage) — soft transparent, no aura */
+.mini-overlay{
+  position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:90; backdrop-filter: blur(4px);
 }
-.confirm-btn{background:orange;color:#fff;}
-.cancel-btn{background:red;color:#fff;}
+.mini-overlay.show{ display:flex; }
+.mini-box{
+  width:88%; max-width:340px; background: rgba(255,255,255,0.92); color:#111; padding:14px; border-radius:10px;
+  border:1px solid rgba(0,0,0,0.06); box-shadow: 0 10px 30px rgba(0,0,0,0.12); transform: translateY(10px); opacity:0;
+  transition: transform .18s ease, opacity .18s ease;
+}
+.mini-overlay.show .mini-box{ transform: translateY(0); opacity:1; }
+.mini-box p{ margin:0 0 8px 0; font-weight:700; }
+.mini-box input{ width:100%; padding:10px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); }
+
+/* mini actions */
+.mini-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:10px; }
+.mini-done{ background:var(--confirm-green); color:#035703; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
+.mini-cancel{ background:var(--cancel-red); color:#6b0000; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
+
+/* responsive */
+@media (max-width:520px){
+  .modal{ width:94%; padding:16px; }
+  .options{ gap:8px; }
+  .brand h1{ font-size:1.6rem; }
+}
 </style>
 </head>
 <body>
-<!-- Clouds -->
-<img src="clouds.png/cloud2.png" class="cloud">
-<img src="clouds.png/cloud3.png" class="cloud">
 
-<!-- Theme toggle -->
-<div id="themeToggle">🌙</div>
+<!-- Top controls: Day/Night toggle then Hamburger -->
+<div class="top-controls">
+  <button id="themeToggle" title="Toggle theme">🌙</button>
+  <button id="menuToggle" title="Menu">☰</button>
+</div>
 
+<!-- Main content -->
 <div class="wrap">
   <div class="brand">
-    <div class="logo"><img src="sidrafly-logo.png" alt="SidraFly Logo"></div>
+    <div class="logo"><img src="sidrafly-logo.png" alt="SidraFly logo"></div>
     <h1>Welcome to SidraFly</h1>
-    <p>Where your journey begins with trust and comfort</p>
+    <p>Begin your journey with ease and comfort</p>
   </div>
 
-  <div class="options">
+  <div class="options" aria-label="booking options">
     <button class="option-btn" data-type="Flight">Book a Flight</button>
     <button class="option-btn" data-type="Bus">Take a Bus</button>
     <button class="option-btn" data-type="Hotel">Hotel / Restaurant</button>
   </div>
-
-  <div class="cards"></div>
 </div>
 
-<!-- Popup Calendar -->
-<div id="bookingModal" class="modal">
-  <h2 id="modalTitle">Booking</h2>
-  <p>Choose your desired date:</p>
-  <input type="date" id="bookingDate">
-  <div class="modal-buttons">
-    <button class="confirm-btn" id="confirmBooking">Confirm</button>
-    <button class="cancel-btn" id="cancelBooking">Cancel</button>
+<!-- Overlay + modal (Flight booking) -->
+<div id="overlay" class="overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="hdr">
+      <h3 id="modalTitle">Book a Flight</h3>
+      <button class="close-btn" id="modalClose" title="Close">×</button>
+    </div>
+
+    <form id="flightForm" autocomplete="off">
+      <div class="form-row">
+        <label for="fromAirport">From</label>
+        <select id="fromAirport" required></select>
+      </div>
+
+      <div class="form-row">
+        <label for="toAirport">To</label>
+        <select id="toAirport" required></select>
+      </div>
+
+      <div class="form-row inline">
+        <div style="flex:1">
+          <label for="passengers">Passengers</label>
+          <select id="passengers" class="small" required></select>
+        </div>
+        <div style="flex:1">
+          <label for="baggage">Baggage</label>
+          <select id="baggage" required>
+            <option value="5">5 kg</option>
+            <option value="10">10 kg</option>
+            <option value="15">15 kg</option>
+            <option value="20">20 kg</option>
+            <option value="25">25 kg</option>
+            <option value="30">30 kg</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Ticket Type</label>
+        <div class="ticket-row">
+          <label><input type="radio" name="ticketType" value="oneway" checked> One-way</label>
+          <label><input type="radio" name="ticketType" value="return"> Return</label>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label for="travelDate">Travel Date</label>
+        <input type="date" id="travelDate" required>
+      </div>
+
+      <div class="modal-buttons">
+        <button type="button" id="modalCancel" class="btn btn-cancel">Cancel</button>
+        <button type="submit" id="modalConfirm" class="btn btn-confirm">Confirm</button>
+      </div>
+    </form>
   </div>
 </div>
 
-<!-- Bottom Nav -->
-<div class="bottom-nav">
+<!-- Mini overlay for custom baggage -->
+<div id="miniOverlay" class="mini-overlay" aria-hidden="true">
+  <div class="mini-box" role="dialog" aria-modal="true" aria-labelledby="miniTitle">
+    <p id="miniTitle">Enter your custom baggage weight (kg):</p>
+    <input id="customWeight" type="number" min="1" placeholder="e.g. 35" />
+    <div class="mini-actions">
+      <button id="miniCancel" class="mini-cancel">Cancel</button>
+      <button id="miniDone" class="mini-done">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom nav -->
+<div class="bottom-nav" aria-hidden="false">
   <div class="nav-item">🏠<span>Home</span></div>
-  <div class="nav-item">💳<span>Wallet</span></div>
   <div class="nav-item">📅<span>Bookings</span></div>
+  <div class="nav-item">💳<span>Wallet</span></div>
 </div>
 
 <script>
-// Theme toggle
-const toggle = document.getElementById('themeToggle');
-toggle.addEventListener('click', ()=>{
-  document.body.classList.toggle('light');
-  toggle.textContent = document.body.classList.contains('light')?'☀️':'🌙';
-});
+/* ---------- Preset airport list and helpers ---------- */
+const airports = [
+  { code: 'ISB', name: 'Islamabad International Airport' },
+  { code: 'KHI', name: 'Jinnah Intl, Karachi' },
+  { code: 'LHE', name: 'Allama Iqbal Intl, Lahore' },
+  { code: 'DOH', name: 'Hamad Intl, Doha' },
+  { code: 'DXB', name: 'Dubai Intl' },
+  { code: 'LHR', name: 'London Heathrow' },
+  { code: 'CDG', name: 'Paris Charles de Gaulle' },
+  { code: 'JFK', name: 'John F. Kennedy Intl, New York' },
+  { code: 'KUL', name: 'Kuala Lumpur Intl' },
+  { code: 'JED', name: 'King Abdulaziz Intl, Jeddah' }
+];
 
-// Popup booking
-const modal = document.getElementById('bookingModal');
-const modalTitle = document.getElementById('modalTitle');
-const bookingDate = document.getElementById('bookingDate');
+function populateSelect(sel, list) {
+  sel.innerHTML = '';
+  const ph = document.createElement('option');
+  ph.value = '';
+  ph.textContent = '-- Select airport --';
+  ph.disabled = true;
+  ph.selected = true;
+  sel.appendChild(ph);
 
-document.querySelectorAll('.option-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    modalTitle.textContent = btn.dataset.type + " Booking";
-    modal.style.display = 'block';
+  list.forEach(a => {
+    const o = document.createElement('option');
+    o.value = a.code;
+    o.textContent = `${a.code} — ${a.name}`;
+    sel.appendChild(o);
   });
+}
+
+function populatePassengers(sel) {
+  sel.innerHTML = '';
+  for (let i=1;i<=10;i++){
+    const o = document.createElement('option');
+    o.value = i;
+    o.textContent = `${i}`;
+    sel.appendChild(o);
+  }
+}
+
+/* ---------- Elements ---------- */
+const overlay = document.getElementById('overlay');
+const modal = overlay.querySelector('.modal');
+const modalClose = document.getElementById('modalClose');
+const modalCancel = document.getElementById('modalCancel');
+const modalConfirm = document.getElementById('modalConfirm');
+const flightForm = document.getElementById('flightForm');
+
+const fromSel = document.getElementById('fromAirport');
+const toSel = document.getElementById('toAirport');
+const passengersSel = document.getElementById('passengers');
+const baggageSel = document.getElementById('baggage');
+const travelDate = document.getElementById('travelDate');
+
+const miniOverlay = document.getElementById('miniOverlay');
+const miniBox = document.querySelector('.mini-box');
+const miniDone = document.getElementById('miniDone');
+const miniCancel = document.getElementById('miniCancel');
+const customWeightInput = document.getElementById('customWeight');
+
+/* top controls */
+const themeToggle = document.getElementById('themeToggle');
+const menuToggle = document.getElementById('menuToggle');
+
+/* booking buttons */
+const flightBtn = document.querySelector('.option-btn[data-type="Flight"]');
+const busBtn = document.querySelector('.option-btn[data-type="Bus"]');
+const hotelBtn = document.querySelector('.option-btn[data-type="Hotel"]');
+
+/* populate on load */
+populateSelect(fromSel, airports);
+populateSelect(toSel, airports);
+populatePassengers(passengersSel);
+
+/* ---------- Modal open/close ---------- */
+function openOverlay() {
+  overlay.classList.add('show');
+  overlay.setAttribute('aria-hidden','false');
+  flightForm.reset();
+  populatePassengers(passengersSel);
+  // small delay to focus first field
+  setTimeout(()=> fromSel.focus(), 220);
+}
+function closeOverlay() {
+  overlay.classList.remove('show');
+  overlay.setAttribute('aria-hidden','true');
+}
+
+/* mini */
+function openMini() {
+  miniOverlay.classList.add('show');
+  miniOverlay.setAttribute('aria-hidden','false');
+  customWeightInput.value = '';
+  customWeightInput.focus();
+}
+function closeMini() {
+  miniOverlay.classList.remove('show');
+  miniOverlay.setAttribute('aria-hidden','true');
+}
+
+/* ---------- Event bindings ---------- */
+flightBtn.addEventListener('click', openOverlay);
+busBtn.addEventListener('click', ()=> alert('Bus booking coming soon.'));
+hotelBtn.addEventListener('click', ()=> alert('Hotel booking coming soon.'));
+
+modalClose.addEventListener('click', closeOverlay);
+modalCancel.addEventListener('click', closeOverlay);
+
+/* close overlay when clicking outside modal */
+overlay.addEventListener('click', (e) => {
+  if (e.target === overlay) closeOverlay();
 });
-document.getElementById('cancelBooking').addEventListener('click', ()=>{modal.style.display='none';});
-document.getElementById('confirmBooking').addEventListener('click', ()=>{
-  alert("Booking confirmed for "+bookingDate.value);
-  modal.style.display='none';
+
+/* baggage => open mini when custom chosen */
+baggageSel.addEventListener('change', () => {
+  if (baggageSel.value === 'custom') openMini();
+});
+
+/* mini actions */
+miniCancel.addEventListener('click', () => {
+  // revert baggage to default (5kg) on cancel
+  baggageSel.value = '5';
+  closeMini();
+});
+miniDone.addEventListener('click', () => {
+  const val = Number(customWeightInput.value);
+  if (!val || val <= 0) {
+    alert('Please enter a valid weight (kg).');
+    customWeightInput.focus();
+    return;
+  }
+  const label = `${val} kg (custom)`;
+  // add new option
+  const newValue = `custom-${val}`;
+  let existing = Array.from(baggageSel.options).find(o => o.value === newValue);
+  if (!existing) {
+    const opt = document.createElement('option');
+    opt.value = newValue;
+    opt.textContent = label;
+    baggageSel.appendChild(opt);
+    baggageSel.value = newValue;
+  } else {
+    baggageSel.value = existing.value;
+  }
+  closeMini();
+});
+
+/* form submit (Confirm) - close automatically */
+flightForm.addEventListener('submit', (ev) => {
+  ev.preventDefault();
+  const from = fromSel.value;
+  const to = toSel.value;
+  const passengers = passengersSel.value;
+  const baggage = baggageSel.value;
+  const ticketType = flightForm.ticketType.value || 'oneway';
+  const date = travelDate.value;
+
+  if (!from) { alert('Please select departure airport (From).'); fromSel.focus(); return; }
+  if (!to) { alert('Please select destination (To).'); toSel.focus(); return; }
+  if (from === to) { alert('Departure and destination cannot be the same.'); toSel.focus(); return; }
+  if (!date) { alert('Please select a travel date.'); travelDate.focus(); return; }
+
+  // For now: log and close
+  console.log('Flight booking data:', { from, to, passengers, baggage, ticketType, date });
+  closeOverlay();
+  setTimeout(()=> alert('Flight details submitted. We will integrate search next.'), 140);
+});
+
+/* close mini when clicking outside mini box */
+miniOverlay.addEventListener('click', (e) => {
+  if (e.target === miniOverlay) closeMini();
+});
+
+/* Theme toggle */
+themeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('light');
+  themeToggle.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+});
+
+/* Hamburger placeholder */
+menuToggle.addEventListener('click', () => {
+  alert('Menu / User profile will open here later.');
 });
 </script>
 </body>
