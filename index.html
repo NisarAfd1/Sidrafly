@@ -10,248 +10,308 @@
 
 <style>
 :root{
-  --bg-900:#06121a;
-  --panel: rgba(255,255,255,0.06);
+  --bg-dark:#06121a;
+  --bg-day:#f7fbfd;            /* glassy crystal white for day */
+  --panel-dark: rgba(15,17,23,0.85);
+  --panel-day: rgba(255,255,255,0.84);
   --muted:#9aa3b2;
-  --text:#ffffff;
+  --text-dark:#ffffff;
+  --text-day:#111;
   --accent:#ff7a00;
   --accent-2:#ff9a33;
   --soft-gold:#d4af37;
   --calm-blue-rgb:77,166,255; /* #4da6ff */
-  --heading-blue-shadow: rgba(0,122,255,0.4);
-  --heading-blue-spread: 18px; /* user requested 18px, opacity 0.4 */
-  --glass-bg: rgba(255,255,255,0.06);
-  --confirm-green: #90EE90;
-  --cancel-red: #ffb6b6;
+  --glass: rgba(255,255,255,0.04);
+  --glow-opacity: 0.50; /* requested 0.50 for main glows */
   --font-main: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --radius-lg:14px;
+  --radius-md:10px;
+  --shadow-strong: 0 18px 46px rgba(0,0,0,0.6);
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;}
+
+/* reset + base */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
 body{
   font-family:var(--font-main);
-  background: linear-gradient(180deg,var(--bg-900),#04101a 140%);
-  color:var(--text);
+  background: linear-gradient(180deg,var(--bg-dark),#04101a 140%);
+  color:var(--text-dark);
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
   overflow-x:hidden;
   transition:background .35s ease, color .35s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Top controls: DAY/NIGHT toggle then HAMBURGER to the right */
+/* Light (day) theme */
+body.light{
+  background: linear-gradient(180deg,var(--bg-day),#e6eef3 160%);
+  color:var(--text-day);
+}
+
+/* Top controls container */
 .top-controls{
-  position:fixed; top:14px; right:14px; display:flex; gap:10px; z-index:60; align-items:center;
+  position:fixed; top:12px; right:12px; display:flex; gap:10px; z-index:1600; align-items:center;
+  transition:opacity .18s ease, transform .18s ease;
 }
-/* Day/night toggle (left) */
-#themeToggle{
-  width:36px; height:36px; display:flex; align-items:center; justify-content:center;
-  border-radius:8px; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08);
-  cursor:pointer; font-size:18px; color: var(--accent);
+/* hide top-controls when menu open (set body.controls-hidden in JS) */
+body.controls-hidden .top-controls{ opacity:0; pointer-events:none; transform:translateY(-8px); }
+
+/* day/night and menu buttons */
+#themeToggle, #menuToggle{
+  width:40px; height:40px; display:flex; align-items:center; justify-content:center;
+  border-radius:10px; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.07);
+  cursor:pointer; font-size:18px; color: var(--accent); box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  transition: transform .14s ease, background .18s ease;
 }
-/* Hamburger (to the right of the toggle) */
-#menuToggle{
-  width:36px; height:36px; display:flex; align-items:center; justify-content:center;
-  border-radius:8px; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08);
-  cursor:pointer; font-size:18px; color:var(--accent);
+#themeToggle:active, #menuToggle:active{ transform: translateY(1px) scale(.995); }
+
+/* side menu (slides from right) */
+.side-menu{
+  position:fixed; top:0; right:-340px; width:320px; height:100%;
+  background: rgba(10,12,18,0.78);
+  backdrop-filter: blur(14px);
+  box-shadow: -6px 0 30px rgba(0,0,0,0.6);
+  transition: right .32s cubic-bezier(.2,.9,.2,1);
+  z-index:1500;
+  padding:22px;
+  display:flex; flex-direction:column; overflow-y:auto;
+  border-left: 1px solid rgba(255,255,255,0.02);
+  border-radius: 8px 0 0 8px;
+}
+/* when light theme, use lighter panel */
+body.light .side-menu{ background: rgba(255,255,255,0.86); color:var(--text-day); border-left:1px solid rgba(0,0,0,0.04); }
+
+.side-menu.open{ right:20px; } /* leaves 20px gap from left side when open */
+
+/* close icon */
+#closeMenu{
+  background:none; border:none; font-size:26px; color: rgba(255,80,80,0.95); align-self:flex-end; cursor:pointer;
+  width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:8px;
 }
 
-/* Main column */
+/* profile area */
+.profile-section{ display:flex; flex-direction:column; align-items:center; gap:8px; padding-bottom:8px;}
+.profile-section img{ width:92px; height:92px; border-radius:50%; object-fit:cover; box-shadow:0 0 20px rgba(var(--calm-blue-rgb),0.45); border: 2px solid rgba(255,255,255,0.04); }
+.profile-section h3{ margin-top:6px; font-size:1.05rem; font-weight:700; color:inherit; }
+
+/* glowing divider */
+.glow-divider{
+  width:100%; height:1px; margin:12px 0; background: rgba(255,255,255,0.06);
+  box-shadow: 0 0 18px rgba(var(--calm-blue-rgb),0.22);
+  border-radius:2px;
+}
+
+/* menu list rows */
+.side-menu nav ul{ list-style:none; padding:0; margin:0 0 6px 0; }
+.side-menu nav li{ display:flex; align-items:center; gap:12px; padding:10px 8px; border-radius:8px; cursor:pointer; color:inherit; transition: background .18s ease, color .18s ease, transform .12s ease; }
+.side-menu nav li:hover{ background: rgba(255,255,255,0.02); transform: translateX(-4px); color:var(--soft-gold); }
+.side-menu nav li .emoji{ font-size:18px; width:28px; text-align:center; }
+.side-menu nav li .label{ font-size:15px; }
+
+/* logout button style */
+.logout{ margin-top:10px; align-self:flex-start; padding:8px 12px; border-radius:10px; color:#fff;
+  background: linear-gradient(90deg, rgba(255,80,80,0.95), rgba(255,60,60,0.95));
+  box-shadow: 0 8px 26px rgba(var(--calm-blue-rgb),0.12); font-weight:700; cursor:pointer; border: none; }
+
+/* wrapper / main column */
 .wrap{
-  max-width:420px; margin:80px auto 120px; display:flex; flex-direction:column; align-items:center; gap:12px;
-  padding:0 18px; position:relative; z-index:10;
+  max-width:420px; margin:84px auto 120px; display:flex; flex-direction:column; align-items:center; gap:12px; padding:0 18px; position:relative; z-index:1;
 }
 
-/* Brand */
+/* brand (logo + heading + slogan) */
 .brand{ display:flex; flex-direction:column; align-items:center; gap:6px; }
-.logo{
-  width:72px; height:72px; border-radius:12px;
-  box-shadow: 0 0 20px rgba(0,122,255,0.56);
-}
-.logo img{ width:100%; height:100%; object-fit:contain; border-radius:12px; }
-
-/* Welcome heading — Playfair Display, soft orange, blue back shadow (18px, 0.4) */
+.logo{ width:82px; height:82px; border-radius:14px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.02); box-shadow: 0 8px 28px rgba(0,0,0,0.6); }
+.logo img{ width:80%; height:80%; object-fit:contain; display:block; filter: none; }
 .brand h1{
-  font-family: 'Playfair Display', serif;
-  font-size:2rem;
-  margin:12px 0 4px 0;
-  color:#ff9a33;
-  text-shadow: 0 0 var(--heading-blue-spread) var(--heading-blue-shadow);
-  font-weight:700;
-  line-height:1.05;
+  font-family: 'Playfair Display', serif; font-size:2.05rem; margin:6px 0 4px; color:var(--accent-2);
+  text-shadow:0 0 18px rgba(0,122,255,0.34); font-weight:700; line-height:1.02;
 }
+.brand p{ color:var(--soft-gold); font-size:1.03rem; font-style:italic; text-align:center; max-width:360px; margin-top:2px; margin-bottom:24px; }
 
-/* Slogan — soft gold, italic; keep short distance to heading, but larger space below before the booking buttons */
-.brand p{
-  color:var(--soft-gold);
-  font-size:1.05rem;
-  font-style:italic;
-  text-align:center;
-  max-width:340px;
-  margin-top:2px;
-  margin-bottom:22px; /* breathing space between slogan and booking buttons */
-}
-
-/* Booking buttons — horizontal, correct order left->right */
-.options{
-  width:100%;
-  display:flex;
-  flex-direction: column; /* stack vertically */
-  gap:12px;
-  justify-content:flex-start; /* aligns buttons at the top */
-  align-items: stretch;       /* makes buttons full width */
-}
+/* options (booking buttons) — horizontal with 3 buttons */
+.options{ width:100%; display:flex; flex-direction:row; gap:10px; justify-content:space-between; }
 .option-btn{
-  flex:1;
-  padding:12px 10px;
-  border-radius:12px;
-  border:none;
-  cursor:pointer;
-  font-weight:700;
-  color:#fff;
-  background: linear-gradient(90deg,var(--accent),var(--accent-2));
-  text-align:center;
-  font-size:0.95rem;
-  box-shadow: 0 0 14px rgba(77,166,255,0.45);
-  transition: transform 180ms ease, box-shadow 180ms ease;
+  flex:1; padding:12px 12px; border-radius:12px; border:none; cursor:pointer; font-weight:700;
+  color:#fff; background: linear-gradient(90deg,var(--accent),var(--accent-2)); text-align:center;
+  font-size:0.95rem; box-shadow:0 10px 32px rgba(0,0,0,0.45), 0 0 18px rgba(var(--calm-blue-rgb),0.12);
+  transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
 }
-.option-btn:hover{
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 0 18px rgba(77,166,255,0.55);
-}
+.option-btn.small{ padding:10px 8px; font-size:0.86rem; }
+.option-btn:hover{ transform: translateY(-4px); box-shadow:0 14px 34px rgba(0,0,0,0.55), 0 0 26px rgba(var(--calm-blue-rgb),0.18); }
 
-/* Bottom nav */
-.bottom-nav{
-  position:fixed; bottom:0; left:0; width:100%;
-  background: rgba(0,0,0,0.45); display:flex; justify-content:space-around;
-  padding:10px 0; backdrop-filter: blur(6px); z-index:20;
-}
-.nav-item{ display:flex; flex-direction:column; align-items:center; color:#fff; font-size:1rem; cursor:pointer; }
-.nav-item span{ font-size:0.82rem; margin-top:4px; }
+/* bottom nav (bigger, emojis visible) */
+.bottom-nav{ position:fixed; bottom:0; left:0; width:100%; background:rgba(0,0,0,0.45); display:flex; justify-content:space-around; padding:12px 0; backdrop-filter:blur(6px); z-index:500; }
+body.light .bottom-nav{ background: rgba(255,255,255,0.9); }
+.nav-item{ display:flex; flex-direction:column; align-items:center; color:#fff; font-size:16px; cursor:pointer; gap:4px; }
+.nav-item .icon{ font-size:20px; }
+.nav-item span{ font-size:12px; opacity:0.95; }
 
-/* Overlay + modal (dim, soft black glass) */
-.overlay{
-  position:fixed; inset:0; background: rgba(0,0,0,0.45); backdrop-filter: blur(8px); display:none;
-  align-items:center; justify-content:center; z-index:70; transition: opacity .25s ease;
-}
-.overlay.show{ display:flex; }
+/* modal overlay (reused for flight/bus/hotel) */
+.modal-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:1400; background: rgba(0,0,0,0.48); backdrop-filter: blur(6px); padding:18px; }
+.modal-overlay.show{ display:flex; }
 
-/* Modal card */
-.modal{
-  width:92%; max-width:520px; background: rgba(0,0,0,0.65); padding:20px; border-radius:14px;
-  box-shadow: 0 12px 36px rgba(0,0,0,0.6); color:#fff; transform: translateY(14px); opacity:0;
-  transition: transform .28s cubic-bezier(.2,.9,.2,1), opacity .28s ease;
-  border:1px solid rgba(255,255,255,0.04);
-}
-.overlay.show .modal{ transform: translateY(0); opacity:1; }
+/* modal card */
+.modal{ width:92%; max-width:640px; background: var(--panel-dark); padding:18px; border-radius:14px; color:var(--text-dark);
+  box-shadow: var(--shadow-strong); border:1px solid rgba(255,255,255,0.03); transform: translateY(8px); opacity:0; transition: transform .28s cubic-bezier(.2,.9,.2,1), opacity .28s ease; }
+body.light .modal{ background: var(--panel-day); color:var(--text-day); border:1px solid rgba(0,0,0,0.04); box-shadow: 0 14px 36px rgba(0,0,0,0.08); }
+.modal-overlay.show .modal{ transform:none; opacity:1; }
+.modal .hdr{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.modal .hdr h3{ margin:0; font-size:1.15rem; font-weight:800; color:var(--accent-2); }
+.modal .hdr .close-btn{ background:transparent; border:none; color:inherit; font-size:22px; cursor:pointer; }
 
-/* Modal content styles */
-.modal .hdr{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-.modal .hdr h3{ margin:0; font-size:1.1rem; font-weight:700; color:var(--accent); }
-.modal .hdr .close-btn{ background:transparent; border:none; color:#fff; font-size:22px; cursor:pointer; }
-
-/* Form rows */
+/* form rows */
 .form-row{ display:flex; flex-direction:column; gap:8px; margin:8px 0; }
 .form-row.inline{ flex-direction:row; gap:12px; align-items:center; }
-label{ font-size:0.9rem; color:var(--muted); }
+label{ font-size:0.95rem; color:var(--muted); }
 
-/* inputs/selects */
-select, input[type="number"], input[type="date"], input[type="text"]{
-  width:100%; padding:10px 12px; border-radius:10px; border:none; background: rgba(255,255,255,0.03);
-  color:var(--text); font-size:0.95rem; outline:none; border:1px solid rgba(255,255,255,0.03);
+/* bubble inputs (the "cute" bubble look) */
+.bubble-input, select.bubble-select{
+  width:100%;
+  padding:12px 14px;
+  border-radius:12px;
+  border:none;
+  background: rgba(255,255,255,0.02);
+  color:inherit;
+  font-size:0.95rem;
+  outline:none;
+  box-shadow: 0 6px 20px rgba(var(--calm-blue-rgb),0.10) inset, 0 6px 18px rgba(0,0,0,0.35);
+  transition: box-shadow .18s ease, transform .12s ease, background .18s ease;
 }
-select.small{ max-width:140px; }
+body.light .bubble-input, body.light select.bubble-select { background: rgba(255,255,255,0.94); color:var(--text-day); box-shadow: 0 6px 18px rgba(var(--calm-blue-rgb),0.06) inset; }
+.bubble-input:focus, select.bubble-select:focus{ box-shadow: 0 10px 40px rgba(var(--calm-blue-rgb),0.20); transform: translateY(-2px); }
 
-/* focus aura */
-select:focus, input:focus{
-  box-shadow: 0 0 14px rgba(77,166,255,0.45);
-  transform: translateY(-1px);
-}
-
-/* ticket radios row */
-.ticket-row{ display:flex; gap:12px; align-items:center; }
+/* small select width helpers */
+select.small{ max-width:150px; }
 
 /* modal buttons */
-.modal .modal-buttons{ display:flex; gap:12px; justify-content:flex-end; margin-top:12px; }
-.btn{ padding:10px 14px; border-radius:8px; border:none; cursor:pointer; font-weight:700; }
-.btn-confirm{ background: var(--confirm-green); color:#035703; box-shadow: 0 6px 18px rgba(0,122,255,0.18); }
-.btn-cancel{ background: var(--cancel-red); color:#6b0000; box-shadow: 0 6px 18px rgba(0,122,255,0.12); }
+.modal-actions{ display:flex; gap:12px; justify-content:flex-end; margin-top:12px; }
+.btn{ padding:10px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:800; }
+.btn-confirm{ background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; box-shadow:0 10px 30px rgba(var(--calm-blue-rgb),0.14); }
+.btn-cancel{ background: rgba(255,90,90,0.95); color:#420000; box-shadow:0 6px 18px rgba(var(--calm-blue-rgb),0.08); }
 
-/* Mini popup (custom baggage) — soft transparent, no aura */
-.mini-overlay{
-  position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:90; backdrop-filter: blur(4px);
-}
-.mini-overlay.show{ display:flex; }
-.mini-box{
-  width:88%; max-width:340px; background: rgba(255,255,255,0.92); color:#111; padding:14px; border-radius:10px;
-  border:1px solid rgba(0,0,0,0.06); box-shadow: 0 10px 30px rgba(0,0,0,0.12); transform: translateY(10px); opacity:0;
-  transition: transform .18s ease, opacity .18s ease;
-}
-.mini-overlay.show .mini-box{ transform: translateY(0); opacity:1; }
-.mini-box p{ margin:0 0 8px 0; font-weight:700; }
-.mini-box input{ width:100%; padding:10px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); }
-
-/* mini actions */
+/* mini popup for custom baggage */
+.mini-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:1600; }
+.mini-overlay.show{ display:flex; background: rgba(0,0,0,0.42); }
+.mini-box{ width:88%; max-width:340px; background:#fff; color:#111; padding:14px; border-radius:10px; border:1px solid rgba(0,0,0,0.06); box-shadow:0 12px 30px rgba(0,0,0,0.14); }
 .mini-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:10px; }
-.mini-done{ background:var(--confirm-green); color:#035703; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
-.mini-cancel{ background:var(--cancel-red); color:#6b0000; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
+.mini-done{ background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; border:none; padding:8px 12px; border-radius:8px; font-weight:700; }
+.mini-cancel{ background: rgba(255,90,90,0.95); color:#6b0000; border:none; padding:8px 12px; border-radius:8px; font-weight:700; }
+
+/* small helpers */
+.small-note{ font-size:0.85rem; color:var(--muted); margin-top:6px; }
 
 /* responsive */
-@media (max-width:520px){
-  .modal{ width:94%; padding:16px; }
-  .options{ gap:8px; }
-  .brand h1{ font-size:1.6rem; }
+@media (max-width:740px){
+  .options{ flex-direction:column; }
+  .side-menu{ width:92%; right:-100%; }
+  .side-menu.open{ right:0; }
+  .side-menu{ border-radius:0; }
+  #themeToggle, #menuToggle{ width:38px; height:38px; font-size:16px; }
 }
 </style>
 </head>
 <body>
 
-<!-- Top controls: Day/Night toggle then Hamburger -->
+<!-- Top controls: Day/Night + Menu -->
 <div class="top-controls">
-  <button id="themeToggle" title="Toggle theme">🌙</button>
+  <button id="themeToggle" title="Toggle theme">🌞</button>
   <button id="menuToggle" title="Menu">☰</button>
 </div>
 
+<!-- Side Menu -->
+<aside id="sideMenu" class="side-menu" aria-hidden="true">
+  <button id="closeMenu" title="Close">✕</button>
+
+  <div class="profile-section" role="region" aria-label="User profile">
+    <img src="sidrafly-logo.png" alt="User profile image" id="profilePic">
+    <h3 id="profileName">Muhammad Nisar</h3>
+  </div>
+
+  <div class="glow-divider" aria-hidden="true"></div>
+
+  <nav aria-label="Main menu">
+    <ul>
+      <li onclick="navClick('home')"><span class="emoji">🏠</span><span class="label">Home</span></li>
+      <li onclick="navClick('profile')"><span class="emoji">👤</span><span class="label">Profile</span></li>
+      <li onclick="navClick('history')"><span class="emoji">🧭</span><span class="label">Travel History</span></li>
+      <li onclick="navClick('rewards')"><span class="emoji">🎁</span><span class="label">Reward Points</span></li>
+      <li onclick="navClick('payments')"><span class="emoji">💳</span><span class="label">Payment Methods</span></li>
+    </ul>
+  </nav>
+
+  <div class="glow-divider soft" aria-hidden="true"></div>
+
+  <nav aria-label="Secondary menu">
+    <ul>
+      <li onclick="navClick('invite')"><span class="emoji">🤝</span><span class="label">Invite & Earn</span></li>
+      <li onclick="navClick('contact')"><span class="emoji">✉️</span><span class="label">Contact Us</span></li>
+      <li onclick="navClick('privacy')"><span class="emoji">🔒</span><span class="label">Privacy Policy</span></li>
+      <li onclick="navClick('complaint')"><span class="emoji">📝</span><span class="label">Lodge Complaint</span></li>
+      <li onclick="navClick('language')"><span class="emoji">🌐</span><span class="label">Select Language</span></li>
+      <li onclick="navClick('terms')"><span class="emoji">📜</span><span class="label">Terms & Conditions</span></li>
+    </ul>
+  </nav>
+
+  <div style="height:12px"></div>
+
+  <button class="logout" id="logoutBtn">Log out</button>
+</aside>
+
 <!-- Main content -->
-<div class="wrap">
-  <div class="brand">
-    <div class="logo"><img src="sidrafly-logo.png" alt="SidraFly logo"></div>
-    <h1>Welcome to SidraFly</h1>
-    <p>Begin your journey with ease and comfort</p>
+<main class="wrap" role="main">
+  <div class="brand" role="banner">
+    <div class="logo"><img src="sidrafly-logo.png" alt="SidraFly logo" id="mainLogo"></div>
+    <h1 id="welcomeHeading">Welcome to SidraFly</h1>
+    <p id="slogan">Begin your journey with ease and comfort</p>
   </div>
 
-  <div class="options" aria-label="booking options">
-    <button class="option-btn" data-type="Flight">Book a Flight</button>
-    <button class="option-btn" data-type="Bus">Take a Bus</button>
-    <button class="option-btn" data-type="Hotel">Hotel / Restaurant</button>
+  <!-- Booking buttons (horizontal) -->
+  <div class="options" role="navigation" aria-label="Booking options">
+    <button class="option-btn" id="flightBtn" data-type="Flight">✈️ Book a Flight</button>
+    <button class="option-btn" id="busBtn" data-type="Bus">🚌 Take a Bus</button>
+    <button class="option-btn" id="hotelBtn" data-type="Hotel">🏨 Hotel / Restaurant</button>
   </div>
-</div>
 
-<!-- Overlay + modal (Flight booking) -->
-<div id="overlay" class="overlay" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div style="height:18px"></div>
+
+  <div class="cards" style="width:100%; max-width:420px;"></div>
+</main>
+
+<!-- Bottom nav -->
+<nav class="bottom-nav" role="navigation" aria-label="Bottom navigation">
+  <div class="nav-item" onclick="navClick('home')"><div class="icon">🏠</div><span>Home</span></div>
+  <div class="nav-item" onclick="navClick('bookings')"><div class="icon">📅</div><span>Bookings</span></div>
+  <div class="nav-item" onclick="navClick('wallet')"><div class="icon">💳</div><span>Wallet</span></div>
+</nav>
+
+<!-- Flight Modal -->
+<div id="flightOverlay" class="modal-overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="flightTitle">
     <div class="hdr">
-      <h3 id="modalTitle">Book a Flight</h3>
-      <button class="close-btn" id="modalClose" title="Close">×</button>
+      <h3 id="flightTitle">Flight Booking</h3>
+      <button class="close-btn" id="flightClose" aria-label="Close">✕</button>
     </div>
 
     <form id="flightForm" autocomplete="off">
       <div class="form-row">
         <label for="fromAirport">From</label>
-        <select id="fromAirport" required></select>
+        <select id="fromAirport" class="bubble-select" required></select>
       </div>
 
       <div class="form-row">
         <label for="toAirport">To</label>
-        <select id="toAirport" required></select>
+        <select id="toAirport" class="bubble-select" required></select>
       </div>
 
       <div class="form-row inline">
         <div style="flex:1">
-          <label for="passengers">Passengers</label>
-          <select id="passengers" class="small" required></select>
+          <label for="flightPassengers">Passengers</label>
+          <select id="flightPassengers" class="bubble-select small" required></select>
         </div>
         <div style="flex:1">
-          <label for="baggage">Baggage</label>
-          <select id="baggage" required>
+          <label for="flightBaggage">Baggage</label>
+          <select id="flightBaggage" class="bubble-select" required>
             <option value="5">5 kg</option>
             <option value="10">10 kg</option>
             <option value="15">15 kg</option>
@@ -264,31 +324,108 @@ select:focus, input:focus{
       </div>
 
       <div class="form-row">
-        <label>Ticket Type</label>
-        <div class="ticket-row">
-          <label><input type="radio" name="ticketType" value="oneway" checked> One-way</label>
-          <label><input type="radio" name="ticketType" value="return"> Return</label>
-        </div>
+        <label>Ticket</label>
+        <select id="flightTicketType" class="bubble-select">
+          <option value="oneway">One-way</option>
+          <option value="twoway">Two-way</option>
+        </select>
       </div>
 
       <div class="form-row">
-        <label for="travelDate">Travel Date</label>
-        <input type="date" id="travelDate" required>
+        <label for="flightDate">Date</label>
+        <input type="date" id="flightDate" class="bubble-input" required>
       </div>
 
-      <div class="modal-buttons">
-        <button type="button" id="modalCancel" class="btn btn-cancel">Cancel</button>
-        <button type="submit" id="modalConfirm" class="btn btn-confirm">Confirm</button>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-cancel" id="flightCancel">Cancel</button>
+        <button type="submit" class="btn btn-confirm" id="flightConfirm">Confirm</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- Mini overlay for custom baggage -->
-<div id="miniOverlay" class="mini-overlay" aria-hidden="true">
-  <div class="mini-box" role="dialog" aria-modal="true" aria-labelledby="miniTitle">
-    <p id="miniTitle">Enter your custom baggage weight (kg):</p>
-    <input id="customWeight" type="number" min="1" placeholder="e.g. 35" />
+<!-- Bus Modal -->
+<div id="busOverlay" class="modal-overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="busTitle">
+    <div class="hdr">
+      <h3 id="busTitle">Bus Booking</h3>
+      <button class="close-btn" id="busClose" aria-label="Close">✕</button>
+    </div>
+
+    <form id="busForm" autocomplete="off">
+      <div class="form-row">
+        <label for="busCountry">Country</label>
+        <select id="busCountry" class="bubble-select" required></select>
+      </div>
+
+      <div class="form-row">
+        <label for="busFrom">From (city)</label>
+        <input list="busFromCities" id="busFrom" class="bubble-input" placeholder="Type to see suggestions" required>
+        <datalist id="busFromCities"></datalist>
+      </div>
+
+      <div class="form-row">
+        <label for="busTo">To (city)</label>
+        <input list="busToCities" id="busTo" class="bubble-input" placeholder="Type to see suggestions" required>
+        <datalist id="busToCities"></datalist>
+      </div>
+
+      <div class="form-row">
+        <label for="busPassengers">Passengers</label>
+        <select id="busPassengers" class="bubble-select small" required></select>
+      </div>
+
+      <div class="form-row">
+        <label for="busDate">Date</label>
+        <input type="date" id="busDate" class="bubble-input" required>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-cancel" id="busCancel">Cancel</button>
+        <button type="submit" class="btn btn-confirm" id="busConfirm">Book Bus</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Hotel / Restaurant Modal (API-ready) -->
+<div id="hotelOverlay" class="modal-overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="hotelTitle">
+    <div class="hdr">
+      <h3 id="hotelTitle">Book your hotel or restaurant reservation here</h3>
+      <button class="close-btn" id="hotelClose" aria-label="Close">✕</button>
+    </div>
+
+    <form id="hotelForm" autocomplete="off">
+      <div class="form-row">
+        <label for="hotelCountry">Country</label>
+        <select id="hotelCountry" class="bubble-select" required></select>
+      </div>
+
+      <div class="form-row">
+        <label for="hotelCity">City</label>
+        <input list="hotelCities" id="hotelCity" class="bubble-input" placeholder="Start typing city" required>
+        <datalist id="hotelCities"></datalist>
+      </div>
+
+      <div class="form-row">
+        <label>Search results (hotels & restaurants)</label>
+        <div id="hotelResults" class="small-note">Select a city and click Search to view results.</div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+        <button type="button" class="btn btn-cancel" id="hotelCancel">Cancel</button>
+        <button type="button" class="btn btn-confirm" id="hotelSearch">Search</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Mini baggage pop -->
+<div id="baggageMini" class="mini-overlay" aria-hidden="true">
+  <div class="mini-box" role="dialog" aria-modal="true">
+    <p style="font-weight:700;margin:0 0 8px 0">Enter custom baggage weight (kg)</p>
+    <input type="number" id="customBaggageInput" min="1" placeholder="e.g. 28" />
     <div class="mini-actions">
       <button id="miniCancel" class="mini-cancel">Cancel</button>
       <button id="miniDone" class="mini-done">Done</button>
@@ -296,199 +433,381 @@ select:focus, input:focus{
   </div>
 </div>
 
-<!-- Bottom nav -->
-<div class="bottom-nav" aria-hidden="false">
-  <div class="nav-item">🏠<span>Home</span></div>
-  <div class="nav-item">📅<span>Bookings</span></div>
-  <div class="nav-item">💳<span>Wallet</span></div>
-</div>
-
 <script>
-/* ---------- Preset airport list and helpers ---------- */
+/* -----------------------
+   Utility data & functions
+   ----------------------- */
+
+/* airports list used by flight modal (common airports) */
 const airports = [
   { code: 'ISB', name: 'Islamabad International Airport' },
   { code: 'KHI', name: 'Jinnah Intl, Karachi' },
   { code: 'LHE', name: 'Allama Iqbal Intl, Lahore' },
+  { code: 'PEW', name: 'Peshawar Intl' },
+  { code: 'UET', name: 'Quetta Intl' },
   { code: 'DOH', name: 'Hamad Intl, Doha' },
   { code: 'DXB', name: 'Dubai Intl' },
   { code: 'LHR', name: 'London Heathrow' },
-  { code: 'CDG', name: 'Paris Charles de Gaulle' },
-  { code: 'JFK', name: 'John F. Kennedy Intl, New York' },
-  { code: 'KUL', name: 'Kuala Lumpur Intl' },
-  { code: 'JED', name: 'King Abdulaziz Intl, Jeddah' }
+  { code: 'JFK', name: 'John F. Kennedy Intl, New York' }
 ];
 
-function populateSelect(sel, list) {
-  sel.innerHTML = '';
-  const ph = document.createElement('option');
-  ph.value = '';
-  ph.textContent = '-- Select airport --';
-  ph.disabled = true;
-  ph.selected = true;
-  sel.appendChild(ph);
+/* bus cities for Pakistan (initial seed) */
+const busCitiesByCountry = {
+  'Pakistan': ['Islamabad','Lahore','Peshawar','Karachi','Quetta','Faisalabad','Multan','Sialkot','Gujranwala','Abbottabad','Rawalpindi'],
+  'United Arab Emirates': ['Dubai','Abu Dhabi','Sharjah'],
+  'United Kingdom': ['London','Manchester','Birmingham']
+};
 
-  list.forEach(a => {
-    const o = document.createElement('option');
-    o.value = a.code;
-    o.textContent = `${a.code} — ${a.name}`;
+/* countries for selects */
+const countries = Object.keys(busCitiesByCountry);
+
+/* helper to populate select */
+function populateSelect(sel, list, includePlaceholder=true){
+  sel.innerHTML='';
+  if(includePlaceholder){
+    const ph = document.createElement('option'); ph.value=''; ph.disabled=true; ph.selected=true; ph.textContent='-- Select --';
+    sel.appendChild(ph);
+  }
+  list.forEach(item=>{
+    const o=document.createElement('option');
+    if(typeof item === 'string'){ o.value=item; o.textContent=item; }
+    else{ o.value = item.code || item.value || item.name; o.textContent = item.code? `${item.code} — ${item.name}`: (item.name||item.value); }
     sel.appendChild(o);
   });
 }
 
-function populatePassengers(sel) {
-  sel.innerHTML = '';
-  for (let i=1;i<=10;i++){
-    const o = document.createElement('option');
-    o.value = i;
-    o.textContent = `${i}`;
-    sel.appendChild(o);
+/* populate passengers 1..10 */
+function populatePassengers(sel){
+  sel.innerHTML='';
+  for(let i=1;i<=10;i++){
+    const o=document.createElement('option'); o.value=i; o.textContent=i; sel.appendChild(o);
   }
 }
 
-/* ---------- Elements ---------- */
-const overlay = document.getElementById('overlay');
-const modal = overlay.querySelector('.modal');
-const modalClose = document.getElementById('modalClose');
-const modalCancel = document.getElementById('modalCancel');
-const modalConfirm = document.getElementById('modalConfirm');
-const flightForm = document.getElementById('flightForm');
-
-const fromSel = document.getElementById('fromAirport');
-const toSel = document.getElementById('toAirport');
-const passengersSel = document.getElementById('passengers');
-const baggageSel = document.getElementById('baggage');
-const travelDate = document.getElementById('travelDate');
-
-const miniOverlay = document.getElementById('miniOverlay');
-const miniBox = document.querySelector('.mini-box');
-const miniDone = document.getElementById('miniDone');
-const miniCancel = document.getElementById('miniCancel');
-const customWeightInput = document.getElementById('customWeight');
-
-/* top controls */
+/* -------------- UI elements -------------- */
 const themeToggle = document.getElementById('themeToggle');
 const menuToggle = document.getElementById('menuToggle');
+const sideMenu = document.getElementById('sideMenu');
+const closeMenu = document.getElementById('closeMenu');
 
-/* booking buttons */
-const flightBtn = document.querySelector('.option-btn[data-type="Flight"]');
-const busBtn = document.querySelector('.option-btn[data-type="Bus"]');
-const hotelBtn = document.querySelector('.option-btn[data-type="Hotel"]');
+// Flight modal elements
+const flightOverlay = document.getElementById('flightOverlay');
+const flightForm = document.getElementById('flightForm');
+const fromSel = document.getElementById('fromAirport');
+const toSel = document.getElementById('toAirport');
+const passengersSel = document.getElementById('flightPassengers');
+const baggageSel = document.getElementById('flightBaggage');
+const flightDate = document.getElementById('flightDate');
+const flightCancel = document.getElementById('flightCancel');
+const flightClose = document.getElementById('flightClose');
 
-/* populate on load */
-populateSelect(fromSel, airports);
-populateSelect(toSel, airports);
-populatePassengers(passengersSel);
+// Bus modal elements
+const busOverlay = document.getElementById('busOverlay');
+const busForm = document.getElementById('busForm');
+const busCountry = document.getElementById('busCountry');
+const busFrom = document.getElementById('busFrom');
+const busTo = document.getElementById('busTo');
+const busFromCities = document.getElementById('busFromCities');
+const busToCities = document.getElementById('busToCities');
+const busPassengers = document.getElementById('busPassengers');
+const busDate = document.getElementById('busDate');
+const busCancel = document.getElementById('busCancel');
+const busClose = document.getElementById('busClose');
 
-/* ---------- Modal open/close ---------- */
-function openOverlay() {
-  overlay.classList.add('show');
-  overlay.setAttribute('aria-hidden','false');
-  flightForm.reset();
+// Hotel modal
+const hotelOverlay = document.getElementById('hotelOverlay');
+const hotelCountry = document.getElementById('hotelCountry');
+const hotelCity = document.getElementById('hotelCity');
+const hotelCities = document.getElementById('hotelCities');
+const hotelCancel = document.getElementById('hotelCancel');
+const hotelSearch = document.getElementById('hotelSearch');
+const hotelClose = document.getElementById('hotelClose');
+const hotelResults = document.getElementById('hotelResults');
+
+/* baggage mini popup */
+const baggageMini = document.getElementById('baggageMini');
+const miniCancel = document.getElementById('miniCancel');
+const miniDone = document.getElementById('miniDone');
+const customBaggageInput = document.getElementById('customBaggageInput');
+
+/* Options buttons */
+const flightBtn = document.getElementById('flightBtn');
+const busBtn = document.getElementById('busBtn');
+const hotelBtn = document.getElementById('hotelBtn');
+
+/* small helpers for overlay show/hide */
+function showOverlay(el){ el.classList.add('show'); el.setAttribute('aria-hidden','false'); }
+function hideOverlay(el){ el.classList.remove('show'); el.setAttribute('aria-hidden','true'); }
+
+/* ------------------------
+   Initialization on load
+   ------------------------ */
+document.addEventListener('DOMContentLoaded', ()=>{
+
+  // Populate airport selects
+  populateSelect(fromSel, airports);
+  populateSelect(toSel, airports);
+
+  // Populate passengers
   populatePassengers(passengersSel);
-  // small delay to focus first field
-  setTimeout(()=> fromSel.focus(), 220);
+  populatePassengers(busPassengers);
+
+  // Populate country lists
+  populateSelect(busCountry, countries);
+  populateSelect(hotelCountry, countries);
+
+  // Add default cities for initial country (Pakistan)
+  populateBusCityDatalist('Pakistan');
+
+  // Ensure datalists are ready for hotel (same city lists)
+  populateDatalist(hotelCities, busCitiesByCountry['Pakistan'] || []);
+
+  // Default theme icon text
+  themeToggle.textContent = document.body.classList.contains('light') ? '🌙' : '🌞';
+
+});
+
+/* ------------------------
+   Side menu handlers
+   ------------------------ */
+function openSideMenu(){
+  sideMenu.classList.add('open');
+  document.body.classList.add('controls-hidden'); // hide top-controls so close button is visible
+  sideMenu.setAttribute('aria-hidden','false');
 }
-function closeOverlay() {
-  overlay.classList.remove('show');
-  overlay.setAttribute('aria-hidden','true');
+function closeSideMenu(){
+  sideMenu.classList.remove('open');
+  document.body.classList.remove('controls-hidden');
+  sideMenu.setAttribute('aria-hidden','true');
+}
+menuToggle.addEventListener('click', openSideMenu);
+closeMenu.addEventListener('click', closeSideMenu);
+
+/* nav click placeholder */
+function navClick(id){
+  closeSideMenu();
+  // simple placeholder feedback; replace with real navigation when ready
+  alert('Opening: ' + id);
 }
 
-/* mini */
-function openMini() {
-  miniOverlay.classList.add('show');
-  miniOverlay.setAttribute('aria-hidden','false');
-  customWeightInput.value = '';
-  customWeightInput.focus();
-}
-function closeMini() {
-  miniOverlay.classList.remove('show');
-  miniOverlay.setAttribute('aria-hidden','true');
-}
-
-/* ---------- Event bindings ---------- */
-flightBtn.addEventListener('click', openOverlay);
-busBtn.addEventListener('click', ()=> alert('Bus booking coming soon.'));
-hotelBtn.addEventListener('click', ()=> alert('Hotel booking coming soon.'));
-
-modalClose.addEventListener('click', closeOverlay);
-modalCancel.addEventListener('click', closeOverlay);
-
-/* close overlay when clicking outside modal */
-overlay.addEventListener('click', (e) => {
-  if (e.target === overlay) closeOverlay();
+/* logout */
+document.getElementById('logoutBtn').addEventListener('click', ()=> {
+  closeSideMenu();
+  setTimeout(()=> alert('Logged out (placeholder).'), 200);
 });
 
-/* baggage => open mini when custom chosen */
-baggageSel.addEventListener('change', () => {
-  if (baggageSel.value === 'custom') openMini();
-});
-
-/* mini actions */
-miniCancel.addEventListener('click', () => {
-  // revert baggage to default (5kg) on cancel
-  baggageSel.value = '5';
-  closeMini();
-});
-miniDone.addEventListener('click', () => {
-  const val = Number(customWeightInput.value);
-  if (!val || val <= 0) {
-    alert('Please enter a valid weight (kg).');
-    customWeightInput.focus();
-    return;
-  }
-  const label = `${val} kg (custom)`;
-  // add new option
-  const newValue = `custom-${val}`;
-  let existing = Array.from(baggageSel.options).find(o => o.value === newValue);
-  if (!existing) {
-    const opt = document.createElement('option');
-    opt.value = newValue;
-    opt.textContent = label;
-    baggageSel.appendChild(opt);
-    baggageSel.value = newValue;
-  } else {
-    baggageSel.value = existing.value;
-  }
-  closeMini();
-});
-
-/* form submit (Confirm) - close automatically */
-flightForm.addEventListener('submit', (ev) => {
-  ev.preventDefault();
-  const from = fromSel.value;
-  const to = toSel.value;
-  const passengers = passengersSel.value;
-  const baggage = baggageSel.value;
-  const ticketType = flightForm.ticketType.value || 'oneway';
-  const date = travelDate.value;
-
-  if (!from) { alert('Please select departure airport (From).'); fromSel.focus(); return; }
-  if (!to) { alert('Please select destination (To).'); toSel.focus(); return; }
-  if (from === to) { alert('Departure and destination cannot be the same.'); toSel.focus(); return; }
-  if (!date) { alert('Please select a travel date.'); travelDate.focus(); return; }
-
-  // For now: log and close
-  console.log('Flight booking data:', { from, to, passengers, baggage, ticketType, date });
-  closeOverlay();
-  setTimeout(()=> alert('Flight details submitted. We will integrate search next.'), 140);
-});
-
-/* close mini when clicking outside mini box */
-miniOverlay.addEventListener('click', (e) => {
-  if (e.target === miniOverlay) closeMini();
-});
-
-/* Theme toggle */
+/* ------------------------
+   Theme toggle
+   ------------------------ */
 themeToggle.addEventListener('click', () => {
   document.body.classList.toggle('light');
-  themeToggle.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+  // update icon (moon when light to indicate switch back to night)
+  themeToggle.textContent = document.body.classList.contains('light') ? '🌙' : '🌞';
 });
 
-/* Hamburger placeholder */
-menuToggle.addEventListener('click', () => {
-  alert('Menu / User profile will open here later.');
+/* ------------------------
+   Flight modal logic
+   ------------------------ */
+flightBtn.addEventListener('click', ()=> {
+  showOverlay(flightOverlay);
+  // reset and focus
+  flightForm.reset();
+  populateSelect(fromSel, airports);
+  populateSelect(toSel, airports);
+  populatePassengers(passengersSel);
+  setTimeout(()=> fromSel.focus(), 150);
+});
+flightClose.addEventListener('click', ()=> hideOverlay(flightOverlay));
+flightCancel.addEventListener('click', ()=> hideOverlay(flightOverlay));
+flightForm.addEventListener('submit', (ev)=>{
+  ev.preventDefault();
+  const from = fromSel.value, to = toSel.value, passengers = passengersSel.value, baggage = baggageSel.value, ticket = document.getElementById('flightTicketType').value, date = flightDate.value;
+  if(!from || !to){ alert('Please select from and to airports.'); return; }
+  if(from === to){ alert('Departure and destination cannot be the same.'); return; }
+  if(!date){ alert('Please select travel date.'); return; }
+  hideOverlay(flightOverlay);
+  setTimeout(()=> alert(`Flight booked: ${from} → ${to} | ${passengers} pax | ${baggage} | ${ticket} | ${date}`), 220);
+});
+
+/* baggage custom handling */
+baggageSel.addEventListener('change', ()=>{
+  if(baggageSel.value === 'custom') {
+    // open mini
+    baggageMini.classList.add('show'); baggageMini.setAttribute('aria-hidden','false');
+    setTimeout(()=> customBaggageInput.focus(), 80);
+  }
+});
+miniCancel.addEventListener('click', ()=> {
+  baggageMini.classList.remove('show'); baggageMini.setAttribute('aria-hidden','true');
+  baggageSel.value = '5';
+});
+miniDone.addEventListener('click', ()=> {
+  const val = Number(customBaggageInput.value);
+  if(!val || val <= 0){ alert('Enter a valid weight.'); customBaggageInput.focus(); return; }
+  // add custom option
+  const newValue = `custom-${val}`;
+  let existing = Array.from(baggageSel.options).find(o => o.value === newValue);
+  if(!existing){
+    const opt = document.createElement('option');
+    opt.value = newValue; opt.textContent = `${val} kg (custom)`;
+    baggageSel.appendChild(opt);
+    baggageSel.value = newValue;
+  } else { baggageSel.value = existing.value; }
+  baggageMini.classList.remove('show'); baggageMini.setAttribute('aria-hidden','true');
+});
+
+/* close mini when clicking outside */
+baggageMini.addEventListener('click', (e)=> {
+  if(e.target === baggageMini) { baggageMini.classList.remove('show'); baggageMini.setAttribute('aria-hidden','true'); baggageSel.value='5'; }
+});
+
+/* ------------------------
+   Bus modal logic
+   ------------------------ */
+busBtn.addEventListener('click', ()=> {
+  showOverlay(busOverlay);
+  busForm.reset();
+  populateSelect(busCountry, countries);
+  populatePassengers(busPassengers);
+  setTimeout(()=> busCountry.focus(), 150);
+});
+busClose.addEventListener('click', ()=> hideOverlay(busOverlay));
+busCancel.addEventListener('click', ()=> hideOverlay(busOverlay));
+
+/* when country changes, populate datalist of cities */
+busCountry.addEventListener('change', ()=>{
+  const c = busCountry.value;
+  populateBusCityDatalist(c);
+  // set placeholders / default focus
+  setTimeout(()=> busFrom.focus(), 80);
+});
+
+/* helper to fill datalist for bus city inputs */
+function populateBusCityDatalist(country){
+  const cities = busCitiesByCountry[country] || [];
+  // from datalist
+  busFromCities.innerHTML = '';
+  busToCities.innerHTML = '';
+  cities.forEach(city=>{
+    const o1 = document.createElement('option'); o1.value = city; busFromCities.appendChild(o1);
+    const o2 = document.createElement('option'); o2.value = city; busToCities.appendChild(o2);
+  });
+  // also fill hotel datalist if same country
+  populateDatalist(hotelCities, cities);
+}
+
+/* bus form submit */
+busForm.addEventListener('submit', (ev)=>{
+  ev.preventDefault();
+  const c = busCountry.value; const from = busFrom.value; const to = busTo.value; const pax = busPassengers.value; const date = busDate.value;
+  if(!c){ alert('Select country'); return; }
+  if(!from || !to){ alert('Select from and to city'); return; }
+  if(from === to){ alert('From and To must differ'); return; }
+  if(!date){ alert('Select travel date'); return; }
+  hideOverlay(busOverlay);
+  setTimeout(()=> alert(`Bus booking: ${from} → ${to} (${c}) | ${pax} pax | ${date}`), 220);
+});
+
+/* ------------------------
+   Hotel modal logic (API-ready)
+   ------------------------ */
+hotelBtn.addEventListener('click', ()=> {
+  showOverlay(hotelOverlay);
+  hotelForm.reset();
+  populateSelect(hotelCountry, countries);
+  setTimeout(()=> hotelCountry.focus(), 150);
+});
+hotelClose.addEventListener('click', ()=> hideOverlay(hotelOverlay));
+hotelCancel.addEventListener('click', ()=> hideOverlay(hotelOverlay));
+hotelSearch.addEventListener('click', ()=> {
+  const c = hotelCountry.value; const city = hotelCity.value;
+  if(!c){ alert('Select country first'); hotelCountry.focus(); return; }
+  if(!city){ alert('Type or select a city'); hotelCity.focus(); return; }
+  // Placeholder: display "searching..." then fake results message
+  hotelResults.textContent = 'Searching...';
+  // If you want to call an API like RapidAPI GeoDB or Hotels API, do it here.
+  // Example: show where to put the key and endpoint (DO NOT PASTE YOUR KEY DIRECTLY IN THE HTML IN PRODUCTION).
+  // TODO: Replace this mock with your backend call or RapidAPI fetch.
+  setTimeout(()=>{
+    hotelResults.innerHTML = `<strong>Results for ${city}, ${c}</strong><br/>(API integration placeholder — list hotels & restaurants here)`;
+  }, 800);
+});
+
+/* ------------------------
+   small helpers for select/datalist
+   ------------------------ */
+function populateDatalist(dlist, items){
+  dlist.innerHTML = '';
+  (items||[]).forEach(v => {
+    const opt = document.createElement('option'); opt.value = v; dlist.appendChild(opt);
+  });
+}
+
+/* ------------------------
+   Populate initial selects
+   ------------------------ */
+(function seedInitial(){
+  populateSelect(fromSel, airports);
+  populateSelect(toSel, airports);
+  populatePassengers(passengersSel);
+  populatePassengers(busPassengers);
+  populateSelect(busCountry, countries);
+  populateBusCityDatalist('Pakistan');
+  populateSelect(hotelCountry, countries);
+  populateDatalist(hotelCities, busCitiesByCountry['Pakistan']);
+})();
+
+/* ------------------------
+   Close overlays when clicking outside
+   ------------------------ */
+document.querySelectorAll('.modal-overlay').forEach(over => {
+  over.addEventListener('click', (e)=>{
+    if(e.target === over){
+      over.classList.remove('show');
+      over.setAttribute('aria-hidden','true');
+    }
+  });
+});
+
+/* ------------------------
+   Practical note for GeoDB / RapidAPI
+   ------------------------
+   If you want to call GeoDB or other RapidAPI endpoints from the browser for city autocomplete:
+   1) Recommended: proxy the call via your backend to keep the API key secret.
+   2) If you must call from client, replace the placeholder below with your key — but this is not recommended for production.
+
+   Example fetch snippet (UNFINISHED here — for demo only):
+   fetch('https://wft-geo-db.p.rapidapi.com/v1/geo/cities?countryIds=PK&limit=10', {
+     method: 'GET',
+     headers: {
+       'x-rapidapi-host': 'wft-geo-db.p.rapidapi.com',
+       'x-rapidapi-key': 'YOUR_RAPIDAPI_KEY_HERE' // <-- PLACE YOUR KEY HERE (or better: call via backend)
+     }
+   }).then(r=>r.json()).then(data=>{ console.log(data); });
+
+   The path param example you gave earlier:
+   curl --request GET \
+     --url 'https://wft-geo-db.p.rapidapi.com/v1/geo/places/%7BplaceId%7D/distance?toPlaceId=Q60' \
+     --header 'x-rapidapi-host: wft-geo-db.p.rapidapi.com' \
+     --header 'x-rapidapi-key: <YOUR KEY>'
+
+   Replace <YOUR KEY> with the actual key if you want to test. I left integration commented & placeholder so you can add it safely.
+*/
+
+/* ------------------------
+   Accessibility small enhancements
+   ------------------------ */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    // close any open menus/modals
+    closeSideMenu();
+    document.querySelectorAll('.modal-overlay.show').forEach(m=> {
+      m.classList.remove('show');
+      m.setAttribute('aria-hidden','true');
+    });
+    if(baggageMini.classList.contains('show')) { baggageMini.classList.remove('show'); baggageMini.setAttribute('aria-hidden','true'); }
+  }
 });
 </script>
 </body>
 </html>
-<!-- force rebuild -->
