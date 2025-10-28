@@ -1,493 +1,85 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>SidraFly — Prototype</title>
-
-<!-- Playfair Display for heading -->
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
-<style>
-:root{
-  --bg-900:#06121a;
-  --panel: rgba(255,255,255,0.06);
-  --muted:#9aa3b2;
-  --text:#ffffff;
-  --accent:#ff7a00;
-  --accent-2:#ff9a33;
-  --soft-gold:#d4af37;
-  --calm-blue-rgb:77,166,255; /* #4da6ff */
-  --heading-blue-shadow: rgba(0,122,255,0.4);
-  --heading-blue-spread: 18px; /* user requested 18px, opacity 0.4 */
-  --glass-bg: rgba(255,255,255,0.06);
-  --confirm-green: #90EE90;
-  --cancel-red: #ffb6b6;
-  --font-main: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;}
-body{
-  font-family:var(--font-main);
-  background: linear-gradient(180deg,var(--bg-900),#04101a 140%);
-  color:var(--text);
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  overflow-x:hidden;
-  transition:background .35s ease, color .35s ease;
-}
-
-/* Top controls: DAY/NIGHT toggle then HAMBURGER to the right */
-.top-controls{
-  position:fixed; top:14px; right:14px; display:flex; gap:10px; z-index:60; align-items:center;
-}
-/* Day/night toggle (left) */
-#themeToggle{
-  width:36px; height:36px; display:flex; align-items:center; justify-content:center;
-  border-radius:8px; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08);
-  cursor:pointer; font-size:18px; color: var(--accent);
-}
-/* Hamburger (to the right of the toggle) */
-#menuToggle{
-  width:36px; height:36px; display:flex; align-items:center; justify-content:center;
-  border-radius:8px; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08);
-  cursor:pointer; font-size:18px; color:var(--accent);
-}
-
-/* Main column */
-.wrap{
-  max-width:420px; margin:80px auto 120px; display:flex; flex-direction:column; align-items:center; gap:12px;
-  padding:0 18px; position:relative; z-index:10;
-}
-
-/* Brand */
-.brand{ display:flex; flex-direction:column; align-items:center; gap:6px; }
-.logo{
-  width:72px; height:72px; border-radius:12px;
-  box-shadow: 0 0 20px rgba(0,122,255,0.56);
-}
-.logo img{ width:100%; height:100%; object-fit:contain; border-radius:12px; }
-
-/* Welcome heading — Playfair Display, soft orange, blue back shadow (18px, 0.4) */
-.brand h1{
-  font-family: 'Playfair Display', serif;
-  font-size:2rem;
-  margin:12px 0 4px 0;
-  color:#ff9a33;
-  text-shadow: 0 0 var(--heading-blue-spread) var(--heading-blue-shadow);
-  font-weight:700;
-  line-height:1.05;
-}
-
-/* Slogan — soft gold, italic; keep short distance to heading, but larger space below before the booking buttons */
-.brand p{
-  color:var(--soft-gold);
-  font-size:1.05rem;
-  font-style:italic;
-  text-align:center;
-  max-width:340px;
-  margin-top:2px;
-  margin-bottom:22px; /* breathing space between slogan and booking buttons */
-}
-
-/* Booking buttons — horizontal, correct order left->right */
-.options{
-  width:100%;
-  display:flex;
-  flex-direction: column; /* stack vertically */
-  gap:12px;
-  justify-content:flex-start; /* aligns buttons at the top */
-  align-items: stretch;       /* makes buttons full width */
-}
-.option-btn{
-  flex:1;
-  padding:12px 10px;
-  border-radius:12px;
-  border:none;
-  cursor:pointer;
-  font-weight:700;
-  color:#fff;
-  background: linear-gradient(90deg,var(--accent),var(--accent-2));
-  text-align:center;
-  font-size:0.95rem;
-  box-shadow: 0 0 14px rgba(77,166,255,0.45);
-  transition: transform 180ms ease, box-shadow 180ms ease;
-}
-.option-btn:hover{
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 0 18px rgba(77,166,255,0.55);
-}
-
-/* Bottom nav */
-.bottom-nav{
-  position:fixed; bottom:0; left:0; width:100%;
-  background: rgba(0,0,0,0.45); display:flex; justify-content:space-around;
-  padding:10px 0; backdrop-filter: blur(6px); z-index:20;
-}
-.nav-item{ display:flex; flex-direction:column; align-items:center; color:#fff; font-size:1rem; cursor:pointer; }
-.nav-item span{ font-size:0.82rem; margin-top:4px; }
-
-/* Overlay + modal (dim, soft black glass) */
-.overlay{
-  position:fixed; inset:0; background: rgba(0,0,0,0.45); backdrop-filter: blur(8px); display:none;
-  align-items:center; justify-content:center; z-index:70; transition: opacity .25s ease;
-}
-.overlay.show{ display:flex; }
-
-/* Modal card */
-.modal{
-  width:92%; max-width:520px; background: rgba(0,0,0,0.65); padding:20px; border-radius:14px;
-  box-shadow: 0 12px 36px rgba(0,0,0,0.6); color:#fff; transform: translateY(14px); opacity:0;
-  transition: transform .28s cubic-bezier(.2,.9,.2,1), opacity .28s ease;
-  border:1px solid rgba(255,255,255,0.04);
-}
-.overlay.show .modal{ transform: translateY(0); opacity:1; }
-
-/* Modal content styles */
-.modal .hdr{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-.modal .hdr h3{ margin:0; font-size:1.1rem; font-weight:700; color:var(--accent); }
-.modal .hdr .close-btn{ background:transparent; border:none; color:#fff; font-size:22px; cursor:pointer; }
-
-/* Form rows */
-.form-row{ display:flex; flex-direction:column; gap:8px; margin:8px 0; }
-.form-row.inline{ flex-direction:row; gap:12px; align-items:center; }
-label{ font-size:0.9rem; color:var(--muted); }
-
-/* inputs/selects */
-select, input[type="number"], input[type="date"], input[type="text"]{
-  width:100%; padding:10px 12px; border-radius:10px; border:none; background: rgba(255,255,255,0.03);
-  color:var(--text); font-size:0.95rem; outline:none; border:1px solid rgba(255,255,255,0.03);
-}
-select.small{ max-width:140px; }
-
-/* focus aura */
-select:focus, input:focus{
-  box-shadow: 0 0 14px rgba(77,166,255,0.45);
-  transform: translateY(-1px);
-}
-
-/* ticket radios row */
-.ticket-row{ display:flex; gap:12px; align-items:center; }
-
-/* modal buttons */
-.modal .modal-buttons{ display:flex; gap:12px; justify-content:flex-end; margin-top:12px; }
-.btn{ padding:10px 14px; border-radius:8px; border:none; cursor:pointer; font-weight:700; }
-.btn-confirm{ background: var(--confirm-green); color:#035703; box-shadow: 0 6px 18px rgba(0,122,255,0.18); }
-.btn-cancel{ background: var(--cancel-red); color:#6b0000; box-shadow: 0 6px 18px rgba(0,122,255,0.12); }
-
-/* Mini popup (custom baggage) — soft transparent, no aura */
-.mini-overlay{
-  position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:90; backdrop-filter: blur(4px);
-}
-.mini-overlay.show{ display:flex; }
-.mini-box{
-  width:88%; max-width:340px; background: rgba(255,255,255,0.92); color:#111; padding:14px; border-radius:10px;
-  border:1px solid rgba(0,0,0,0.06); box-shadow: 0 10px 30px rgba(0,0,0,0.12); transform: translateY(10px); opacity:0;
-  transition: transform .18s ease, opacity .18s ease;
-}
-.mini-overlay.show .mini-box{ transform: translateY(0); opacity:1; }
-.mini-box p{ margin:0 0 8px 0; font-weight:700; }
-.mini-box input{ width:100%; padding:10px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); }
-
-/* mini actions */
-.mini-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:10px; }
-.mini-done{ background:var(--confirm-green); color:#035703; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
-.mini-cancel{ background:var(--cancel-red); color:#6b0000; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
-
-/* responsive */
-@media (max-width:520px){
-  .modal{ width:94%; padding:16px; }
-  .options{ gap:8px; }
-  .brand h1{ font-size:1.6rem; }
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SidraFly Auth System</title>
 </head>
 <body>
+  <h1>SidraFly Login / Signup</h1>
 
-<!-- Top controls: Day/Night toggle then Hamburger -->
-<div class="top-controls">
-  <button id="themeToggle" title="Toggle theme">🌙</button>
-  <button id="menuToggle" title="Menu">☰</button>
-</div>
+  <input id="email" type="email" placeholder="Email"><br><br>
+  <input id="password" type="password" placeholder="Password"><br><br>
 
-<!-- Main content -->
-<div class="wrap">
-  <div class="brand">
-    <div class="logo"><img src="sidrafly-logo.png" alt="SidraFly logo"></div>
-    <h1>Welcome to SidraFly</h1>
-    <p>Begin your journey with ease and comfort</p>
-  </div>
+  <button id="signupBtn">Create Account</button>
+  <button id="loginBtn">Login</button>
+  <button id="googleLoginBtn">Login with Google</button>
+  <button id="logoutBtn" style="display:none">Logout</button>
 
-  <div class="options" aria-label="booking options">
-    <button class="option-btn" data-type="Flight">Book a Flight</button>
-    <button class="option-btn" data-type="Bus">Take a Bus</button>
-    <button class="option-btn" data-type="Hotel">Hotel / Restaurant</button>
-  </div>
-</div>
+  <p id="status"></p>
 
-<!-- Overlay + modal (Flight booking) -->
-<div id="overlay" class="overlay" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="hdr">
-      <h3 id="modalTitle">Book a Flight</h3>
-      <button class="close-btn" id="modalClose" title="Close">×</button>
-    </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      GoogleAuthProvider,
+      signInWithPopup
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    <form id="flightForm" autocomplete="off">
-      <div class="form-row">
-        <label for="fromAirport">From</label>
-        <select id="fromAirport" required></select>
-      </div>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDgOAWWOXKbCKwpGaIZOqkZmHIA6z9wJ8M",
+      authDomain: "sidrafly-57bed.firebaseapp.com",
+      projectId: "sidrafly-57bed",
+      storageBucket: "sidrafly-57bed.firebasestorage.app",
+      messagingSenderId: "441230761869",
+      appId: "1:441230761869:web:f054dcc8ccfd29e8c4a7c4"
+    };
 
-      <div class="form-row">
-        <label for="toAirport">To</label>
-        <select id="toAirport" required></select>
-      </div>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider();
 
-      <div class="form-row inline">
-        <div style="flex:1">
-          <label for="passengers">Passengers</label>
-          <select id="passengers" class="small" required></select>
-        </div>
-        <div style="flex:1">
-          <label for="baggage">Baggage</label>
-          <select id="baggage" required>
-            <option value="5">5 kg</option>
-            <option value="10">10 kg</option>
-            <option value="15">15 kg</option>
-            <option value="20">20 kg</option>
-            <option value="25">25 kg</option>
-            <option value="30">30 kg</option>
-            <option value="custom">Custom</option>
-          </select>
-        </div>
-      </div>
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const signupBtn = document.getElementById("signupBtn");
+    const loginBtn = document.getElementById("loginBtn");
+    const googleLoginBtn = document.getElementById("googleLoginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const status = document.getElementById("status");
 
-      <div class="form-row">
-        <label>Ticket Type</label>
-        <div class="ticket-row">
-          <label><input type="radio" name="ticketType" value="oneway" checked> One-way</label>
-          <label><input type="radio" name="ticketType" value="return"> Return</label>
-        </div>
-      </div>
+    signupBtn.onclick = () => {
+      createUserWithEmailAndPassword(auth, email.value, password.value)
+        .then(() => status.innerText = "✅ Account created")
+        .catch(err => status.innerText = "❌ " + err.message);
+    };
 
-      <div class="form-row">
-        <label for="travelDate">Travel Date</label>
-        <input type="date" id="travelDate" required>
-      </div>
+    loginBtn.onclick = () => {
+      signInWithEmailAndPassword(auth, email.value, password.value)
+        .then(() => status.innerText = "✅ Logged in")
+        .catch(err => status.innerText = "❌ " + err.message);
+    };
 
-      <div class="modal-buttons">
-        <button type="button" id="modalCancel" class="btn btn-cancel">Cancel</button>
-        <button type="submit" id="modalConfirm" class="btn btn-confirm">Confirm</button>
-      </div>
-    </form>
-  </div>
-</div>
+    googleLoginBtn.onclick = () => {
+      signInWithPopup(auth, googleProvider)
+        .then(() => status.innerText = "✅ Google login successful")
+        .catch(err => status.innerText = "❌ " + err.message);
+    };
 
-<!-- Mini overlay for custom baggage -->
-<div id="miniOverlay" class="mini-overlay" aria-hidden="true">
-  <div class="mini-box" role="dialog" aria-modal="true" aria-labelledby="miniTitle">
-    <p id="miniTitle">Enter your custom baggage weight (kg):</p>
-    <input id="customWeight" type="number" min="1" placeholder="e.g. 35" />
-    <div class="mini-actions">
-      <button id="miniCancel" class="mini-cancel">Cancel</button>
-      <button id="miniDone" class="mini-done">Done</button>
-    </div>
-  </div>
-</div>
+    logoutBtn.onclick = () => signOut(auth);
 
-<!-- Bottom nav -->
-<div class="bottom-nav" aria-hidden="false">
-  <div class="nav-item">🏠<span>Home</span></div>
-  <div class="nav-item">📅<span>Bookings</span></div>
-  <div class="nav-item">💳<span>Wallet</span></div>
-</div>
-
-<script>
-/* ---------- Preset airport list and helpers ---------- */
-const airports = [
-  { code: 'ISB', name: 'Islamabad International Airport' },
-  { code: 'KHI', name: 'Jinnah Intl, Karachi' },
-  { code: 'LHE', name: 'Allama Iqbal Intl, Lahore' },
-  { code: 'DOH', name: 'Hamad Intl, Doha' },
-  { code: 'DXB', name: 'Dubai Intl' },
-  { code: 'LHR', name: 'London Heathrow' },
-  { code: 'CDG', name: 'Paris Charles de Gaulle' },
-  { code: 'JFK', name: 'John F. Kennedy Intl, New York' },
-  { code: 'KUL', name: 'Kuala Lumpur Intl' },
-  { code: 'JED', name: 'King Abdulaziz Intl, Jeddah' }
-];
-
-function populateSelect(sel, list) {
-  sel.innerHTML = '';
-  const ph = document.createElement('option');
-  ph.value = '';
-  ph.textContent = '-- Select airport --';
-  ph.disabled = true;
-  ph.selected = true;
-  sel.appendChild(ph);
-
-  list.forEach(a => {
-    const o = document.createElement('option');
-    o.value = a.code;
-    o.textContent = `${a.code} — ${a.name}`;
-    sel.appendChild(o);
-  });
-}
-
-function populatePassengers(sel) {
-  sel.innerHTML = '';
-  for (let i=1;i<=10;i++){
-    const o = document.createElement('option');
-    o.value = i;
-    o.textContent = `${i}`;
-    sel.appendChild(o);
-  }
-}
-
-/* ---------- Elements ---------- */
-const overlay = document.getElementById('overlay');
-const modal = overlay.querySelector('.modal');
-const modalClose = document.getElementById('modalClose');
-const modalCancel = document.getElementById('modalCancel');
-const modalConfirm = document.getElementById('modalConfirm');
-const flightForm = document.getElementById('flightForm');
-
-const fromSel = document.getElementById('fromAirport');
-const toSel = document.getElementById('toAirport');
-const passengersSel = document.getElementById('passengers');
-const baggageSel = document.getElementById('baggage');
-const travelDate = document.getElementById('travelDate');
-
-const miniOverlay = document.getElementById('miniOverlay');
-const miniBox = document.querySelector('.mini-box');
-const miniDone = document.getElementById('miniDone');
-const miniCancel = document.getElementById('miniCancel');
-const customWeightInput = document.getElementById('customWeight');
-
-/* top controls */
-const themeToggle = document.getElementById('themeToggle');
-const menuToggle = document.getElementById('menuToggle');
-
-/* booking buttons */
-const flightBtn = document.querySelector('.option-btn[data-type="Flight"]');
-const busBtn = document.querySelector('.option-btn[data-type="Bus"]');
-const hotelBtn = document.querySelector('.option-btn[data-type="Hotel"]');
-
-/* populate on load */
-populateSelect(fromSel, airports);
-populateSelect(toSel, airports);
-populatePassengers(passengersSel);
-
-/* ---------- Modal open/close ---------- */
-function openOverlay() {
-  overlay.classList.add('show');
-  overlay.setAttribute('aria-hidden','false');
-  flightForm.reset();
-  populatePassengers(passengersSel);
-  // small delay to focus first field
-  setTimeout(()=> fromSel.focus(), 220);
-}
-function closeOverlay() {
-  overlay.classList.remove('show');
-  overlay.setAttribute('aria-hidden','true');
-}
-
-/* mini */
-function openMini() {
-  miniOverlay.classList.add('show');
-  miniOverlay.setAttribute('aria-hidden','false');
-  customWeightInput.value = '';
-  customWeightInput.focus();
-}
-function closeMini() {
-  miniOverlay.classList.remove('show');
-  miniOverlay.setAttribute('aria-hidden','true');
-}
-
-/* ---------- Event bindings ---------- */
-flightBtn.addEventListener('click', openOverlay);
-busBtn.addEventListener('click', ()=> alert('Bus booking coming soon.'));
-hotelBtn.addEventListener('click', ()=> alert('Hotel booking coming soon.'));
-
-modalClose.addEventListener('click', closeOverlay);
-modalCancel.addEventListener('click', closeOverlay);
-
-/* close overlay when clicking outside modal */
-overlay.addEventListener('click', (e) => {
-  if (e.target === overlay) closeOverlay();
-});
-
-/* baggage => open mini when custom chosen */
-baggageSel.addEventListener('change', () => {
-  if (baggageSel.value === 'custom') openMini();
-});
-
-/* mini actions */
-miniCancel.addEventListener('click', () => {
-  // revert baggage to default (5kg) on cancel
-  baggageSel.value = '5';
-  closeMini();
-});
-miniDone.addEventListener('click', () => {
-  const val = Number(customWeightInput.value);
-  if (!val || val <= 0) {
-    alert('Please enter a valid weight (kg).');
-    customWeightInput.focus();
-    return;
-  }
-  const label = `${val} kg (custom)`;
-  // add new option
-  const newValue = `custom-${val}`;
-  let existing = Array.from(baggageSel.options).find(o => o.value === newValue);
-  if (!existing) {
-    const opt = document.createElement('option');
-    opt.value = newValue;
-    opt.textContent = label;
-    baggageSel.appendChild(opt);
-    baggageSel.value = newValue;
-  } else {
-    baggageSel.value = existing.value;
-  }
-  closeMini();
-});
-
-/* form submit (Confirm) - close automatically */
-flightForm.addEventListener('submit', (ev) => {
-  ev.preventDefault();
-  const from = fromSel.value;
-  const to = toSel.value;
-  const passengers = passengersSel.value;
-  const baggage = baggageSel.value;
-  const ticketType = flightForm.ticketType.value || 'oneway';
-  const date = travelDate.value;
-
-  if (!from) { alert('Please select departure airport (From).'); fromSel.focus(); return; }
-  if (!to) { alert('Please select destination (To).'); toSel.focus(); return; }
-  if (from === to) { alert('Departure and destination cannot be the same.'); toSel.focus(); return; }
-  if (!date) { alert('Please select a travel date.'); travelDate.focus(); return; }
-
-  // For now: log and close
-  console.log('Flight booking data:', { from, to, passengers, baggage, ticketType, date });
-  closeOverlay();
-  setTimeout(()=> alert('Flight details submitted. We will integrate search next.'), 140);
-});
-
-/* close mini when clicking outside mini box */
-miniOverlay.addEventListener('click', (e) => {
-  if (e.target === miniOverlay) closeMini();
-});
-
-/* Theme toggle */
-themeToggle.addEventListener('click', () => {
-  document.body.classList.toggle('light');
-  themeToggle.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
-});
-
-/* Hamburger placeholder */
-menuToggle.addEventListener('click', () => {
-  alert('Menu / User profile will open here later.');
-});
-</script>
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        status.innerText = `✅ Logged in as: ${user.email}`;
+        logoutBtn.style.display = "inline-block";
+      } else {
+        status.innerText = "🔒 Logged out";
+        logoutBtn.style.display = "none";
+      }
+    });
+  </script>
 </body>
 </html>
