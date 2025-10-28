@@ -809,5 +809,28 @@ document.addEventListener('keydown', (e)=>{
   }
 });
 </script>
+<!-- ✅ Redirect to auth page if user not logged in -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDgOAWWOXKbCKwpGaIZOqkZmHIA6z9wJ8M",
+    authDomain: "sidrafly-57bed.firebaseapp.com",
+    projectId: "sidrafly-57bed",
+    storageBucket: "sidrafly-57bed.firebasestorage.app",
+    messagingSenderId: "441230761869",
+    appId: "1:441230761869:web:f054dcc8ccfd29e8c4a7c4"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = "auth.html";  // redirect to login page
+    }
+  });
+</script>
 </body>
 </html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SidraFly</title>
+
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap");
+
+:root {
+  --brand: #ff7a00;
+  --bg: #05080e;
+  --text: #ffffff;
+  --line: rgba(0, 140, 255, 0.6);
+  --line-glow: rgba(0, 140, 255, 0.8);
+  --glass: rgba(255, 255, 255, 0.05);
+  --icon: #cfd4e3;
+}
+
+body.light {
+  --bg: #f6f6f6;
+  --glass: rgba(255, 255, 255, 0.25);
+  --text: #111;
+  --icon: #333;
+}
+
+/* ✅ ENABLE SCROLLING */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ✅ ZOOM OUT UI */
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  transform: scale(0.90);
+  transform-origin: top center;
+}
+
+/* ✅ GLASSY BUBBLE HEADER FRAME */
+.header-bubble {
+  width: 95%;
+  max-width: 520px;
+  margin-top: 12px;
+  padding: 12px 18px;
+  border-radius: 22px;
+  background: var(--glass);
+  border: 1px solid rgba(0, 132, 255, 0.4);
+  box-shadow: 0 0 32px rgba(0, 132, 255, 0.35);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* HEADER CONTENT INSIDE BUBBLE */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header-left img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 122, 0, 0.5);
+}
+.header-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+/* DAY / NIGHT SWITCH */
+.theme-toggle {
+  font-size: 1.6rem;
+  cursor: pointer;
+  user-select: none;
+  padding: 8px;
+}
+
+/* SECTION */
+.section {
+  width: 100%;
+  text-align: center;
+  padding: 0 20px;
+  margin-top: 20px;
+}
+.section h1 {
+  font-size: 2.3rem;
+  font-weight: 600;
+}
+.section p {
+  max-width: 760px;
+  opacity: 0.85;
+  margin: 12px auto 18px;
+}
+
+/* GLASS CARD */
+.glass-card {
+  margin-top: 24px;
+  width: min(88%, 460px);
+  border-radius: 24px;
+  padding: 32px;
+  background: var(--glass);
+  border: 1px solid rgba(0, 132, 255, 0.6);
+  box-shadow: 0 0 42px rgba(0, 132, 255, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.glass-card img {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 122, 0, 0.6);
+}
+.glass-card h2 {
+  margin: 12px 0 6px;
+  font-size: 1.8rem;
+}
+
+.fly-btn {
+  margin-top: 20px;
+  width: 100%;
+  height: 55px;
+  border-radius: 16px;
+  border: 0;
+  background: linear-gradient(90deg, #ff7a00, #ffaf39);
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.fly-btn:active {
+  transform: scale(0.97);
+}
+.subtle {
+  opacity: 0.6;
+  margin-top: 14px;
+  font-size: 0.85rem;
+}
+
+/* FOOTER */
+.footer-title {
+  margin-bottom: 12px;
+  font-size: 1.05rem;
+  opacity: 0.8;
+}
+.footer-row {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  margin-bottom: 22px;
+}
+
+/* ✅ UPDATED ICON BUTTONS (smaller + glassy + glow) */
+.icon-btn {
+  width: 48px; /* ↓ reduced from 58px */
+  height: 48px; /* ↓ reduced */
+  border-radius: 16px; /* bubble look */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0,132,255,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  transition: 0.25s ease;
+  box-shadow: 0 0 18px rgba(0, 132, 255, 0.35);
+}
+.icon-btn:hover {
+  box-shadow: 0 0 28px rgba(0, 132, 255, 0.65);
+  transform: scale(1.07);
+}
+.icon-btn svg {
+  stroke: var(--icon);
+  width: 22px; /* ↓ reduced from 28px */
+  height: 22px;
+  stroke-width: 2;
+  fill: none;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ✅ HEADER INSIDE BUBBLE FRAME -->
+<div class="header-bubble">
+  <div class="header-left">
+    <img src="sidrafly-logo.png" />
+    <span class="header-title">SidraFly</span>
+  </div>
+  <span class="theme-toggle" onclick="toggleTheme()">🌙</span>
+</div>
+
+<div class="main-wrapper">
+
+  <div class="section">
+    <h1>Welcome to <span style="color:var(--brand)">SidraFly</span></h1>
+    <p>Your next generation blockchain integrated traveling platform delivering innovative solutions and cutting edge technologies for digital payments with crypto.</p>
+  </div>
+
+  <div class="glass-card">
+    <img src="sidrafly-logo.png" alt="">
+    <h2>Get Started</h2>
+    <p>Connect with your SidraFly account</p>
+    <button class="fly-btn" onclick="location.href='auth.html'">Let's Fly</button>
+    <p class="subtle">By logging in, you agree to our <u>Terms of Service</u> and <u>Privacy Policy</u>.</p>
+  </div>
+
+</div>
+
+<p class="footer-title">Quick Access</p>
+<div class="footer-row">
+
+  <button class="icon-btn" onclick="window.open('https://facebook.com', '_blank')">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M14 2h-3C8 2 7 4 7 6v3H5v4h2v9h4v-9h3l1-4h-4V6c0-.3.2-.5.5-.5H14V2z"/>
+    </svg>
+  </button>
+
+  <button class="icon-btn" onclick="window.open('https://twitter.com', '_blank')">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M3 7s3 2 6 2c-3 6-8 4-8 2 3 0 5-2 5-2-3 0-5-2-5-4 1 1 2 1 3 1-2-1-3-3-3-5 2 1 4 2 6 2 0-2 2-4 4-4 1 0 2 .4 3 1 .9-.2 1.7-.5 2.4-.9-.3 1-1 1.9-2 2.4 1 0 1.8-.3 2.6-.7-.6.9-1.3 1.6-2.2 2.1-.2 3.4-2.6 8.8-8.8 10"/>
+    </svg>
+  </button>
+
+  <button class="icon-btn" onclick="window.open('https://sidrafly.com', '_blank')">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>
+    </svg>
+  </button>
+
+</div>
+
+<script>
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  document.querySelector(".theme-toggle").innerText =
+    document.body.classList.contains("light") ? "☀️" : "🌙";
+}
+</script>
+
+</body>
+</html>

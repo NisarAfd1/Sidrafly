@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SidraFly | Login</title>
+<style>
+    body {
+        background: #0a0f1c;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .box {
+        background: #111a31;
+        padding: 25px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 380px;
+        text-align: center;
+        box-shadow: 0px 0px 15px rgba(0,0,0,0.4);
+    }
+    input {
+        width: 90%;
+        padding: 10px;
+        margin: 6px 0;
+        border-radius: 6px;
+        border: none;
+        font-size: 16px;
+    }
+    button {
+        width: 94%;
+        padding: 12px;
+        border: none;
+        margin-top: 8px;
+        font-size: 17px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    .primary { background: #ff8800; color: #fff; }
+    .google { background: #4285F4; color: #fff; }
+    .link { background: none; color: #bbb; border: none; margin-top: 6px; cursor: pointer; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="box">
+    <h2>SidraFly Login ✈️</h2>
+
+    <input id="email" type="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+
+    <button class="primary" onclick="login()">Login</button>
+    <button class="primary" onclick="createAccount()">Create Account</button>
+    <button class="google" onclick="googleLogin()">Login with Google</button>
+
+    <button class="link" onclick="forgotPassword()">Forgot Password?</button>
+
+    <p id="msg"></p>
+</div>
+
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail,
+    GoogleAuthProvider,
+    signInWithPopup
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+// ✅ REPLACE API KEY HERE
+const firebaseConfig = {
+  apiKey: "AIzaSyDgOAWWOXKbCKwpGaIZOqkZmHIA6z9wJ8M",
+  authDomain: "sidrafly-57bed.firebaseapp.com",
+  projectId: "sidrafly-57bed",
+  storageBucket: "sidrafly-57bed.firebasestorage.app",
+  messagingSenderId: "441230761869",
+  appId: "1:441230761869:web:f054dcc8ccfd29e8c4a7c4"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+function showMsg(m) {
+    document.getElementById("msg").innerText = m;
+}
+
+// ✅ LOGIN
+window.login = function () {
+    const email = email.value;
+    const pwd = password.value;
+
+    signInWithEmailAndPassword(auth, email, pwd)
+        .then(() => {
+            showMsg("Login successful ✅");
+            setTimeout(() => window.location.href = "index.html", 800);
+        })
+        .catch(e => showMsg(e.message));
+};
+
+// ✅ CREATE ACCOUNT
+window.createAccount = function () {
+    const email = email.value;
+    const pwd = password.value;
+
+    createUserWithEmailAndPassword(auth, email, pwd)
+        .then(() => {
+            showMsg("Account created ✅");
+            setTimeout(() => window.location.href = "index.html", 800);
+        })
+        .catch(e => showMsg(e.message));
+};
+
+// ✅ GOOGLE LOGIN
+window.googleLogin = function () {
+    signInWithPopup(auth, provider)
+        .then(() => {
+            showMsg("Google Login successful ✅");
+            setTimeout(() => window.location.href = "index.html", 800);
+        })
+        .catch(e => showMsg(e.message));
+};
+
+// ✅ FORGOT PASSWORD
+window.forgotPassword = function () {
+    sendPasswordResetEmail(auth, email.value)
+        .then(() => showMsg("Reset email sent ✅"))
+        .catch(e => showMsg(e.message));
+};
+</script>
+
+</body>
+</html>
