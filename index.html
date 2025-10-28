@@ -489,5 +489,71 @@ menuToggle.addEventListener('click', () => {
   alert('Menu / User profile will open here later.');
 });
 </script>
+
+<!-- ✅ Firebase Authentication UI -->
+<div style="padding: 20px;">
+  <h1>SidraFly Login / Signup</h1>
+
+  <input id="email" type="email" placeholder="Email" /><br><br>
+  <input id="password" type="password" placeholder="Password" /><br><br>
+
+  <button onclick="createAccount()">Create Account</button>
+  <button onclick="login()">Login</button>
+  <button onclick="loginWithGoogle()">Login with Google</button>
+
+  <p id="message" style="color:green;"></p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    GoogleAuthProvider,
+    signInWithPopup
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDgOAWWOXKbCKwpGaIZOqkZmHIA6z9wJ8M",
+    authDomain: "sidrafly-57bed.firebaseapp.com",
+    projectId: "sidrafly-57bed",
+    storageBucket: "sidrafly-57bed.firebasestorage.app",
+    messagingSenderId: "441230761869",
+    appId: "1:441230761869:web:f054dcc8ccfd29e8c4a7c4"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  window.createAccount = function () {
+    const email = document.getElementById("email").value;
+    const pwd = document.getElementById("password").value;
+
+    createUserWithEmailAndPassword(auth, email, pwd)
+      .then(() => showMsg("Account created successfully ✅"))
+      .catch(e => showMsg(e.message));
+  };
+
+  window.login = function () {
+    const email = document.getElementById("email").value;
+    const pwd = document.getElementById("password").value;
+
+    signInWithEmailAndPassword(auth, email, pwd)
+      .then(() => showMsg("Login successful ✅"))
+      .catch(e => showMsg(e.message));
+  };
+
+  window.loginWithGoogle = function () {
+    signInWithPopup(auth, provider)
+      .then(() => showMsg("Google login successful ✅"))
+      .catch(e => showMsg(e.message));
+  };
+
+  function showMsg(msg) {
+    document.getElementById("message").innerText = msg;
+  }
+</script>
 </body>
 </html>
