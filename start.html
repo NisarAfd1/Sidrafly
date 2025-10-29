@@ -199,6 +199,20 @@ body.light {
 .icon-btn:hover {
   transform: scale(1.07);
 }
+
+/* ===== tighten space between card and "Quick Access" ===== */
+.glass-card { 
+  margin-bottom: 0 !important;        /* kill any bottom margin on the card */
+}
+
+.main-wrapper { 
+  margin-bottom: 0 !important;        /* no extra space under the wrapper */
+  padding-bottom: 0 !important;
+}
+
+.main-wrapper + .footer-title {
+  margin-top: 6px !important;         /* final gap = 6px */
+}
 </style>
 </head>
 
