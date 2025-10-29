@@ -118,7 +118,6 @@ body.light {
 /* Glass Card */
 .glass-card {
   margin-top: 22px;
-  margin-bottom: 8px;  /* ✅ reduce space to Quick Access */
   width: min(83%, 440px);
   border-radius: 24px;
   padding: 32px;
@@ -169,22 +168,19 @@ body.light {
   box-shadow: 0 0 35px rgba(255,122,0,0.20);
 }
 
+/* Footer */
 .footer-title {
-  width: 100%;
+  margin-top: 24px;
+  font-size: 1.05rem;
+  opacity: 0.8;
   text-align: center;
-  margin-top:3px;   /* reduced space by ~3px */
-  margin-bottom: 6px;
-  font-size: 1.2rem;
-  opacity: 0.9;
 }
 
 .footer-row {
-  width: 100%;
+  margin-top: 12px;
   display: flex;
-  gap: 14px;
-  justify-content: center;  /* ✅ Centers icons horizontally */
-  align-items: center;
-  margin-bottom: 26px;
+  justify-content: center;
+  gap: 16px;
 }
 
 .icon-btn {
@@ -202,20 +198,6 @@ body.light {
 
 .icon-btn:hover {
   transform: scale(1.07);
-}
-
-/* ===== tighten space between card and "Quick Access" ===== */
-.glass-card { 
-  margin-bottom: 0 !important;        /* kill any bottom margin on the card */
-}
-
-.main-wrapper { 
-  margin-bottom: 0 !important;        /* no extra space under the wrapper */
-  padding-bottom: 0 !important;
-}
-
-.main-wrapper + .footer-title {
-  margin-top: 6px !important;         /* final gap = 6px */
 }
 </style>
 </head>
