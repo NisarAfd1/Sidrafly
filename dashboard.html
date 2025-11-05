@@ -1,532 +1,312 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SidraFly — Dashboard</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SidraFly — Dashboard</title>
 
-<style>
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-/* ---------- Ambient background & particles ---------- */
-#bgCanvas{position:fixed;inset:0;width:100vw;height:100vh;z-index:-2}
-.bg-glow{
-  position:fixed;inset:0;z-index:-1;
-  background:
-    radial-gradient(circle at 15% 8%, #1a237e 0%, transparent 60%),
-    radial-gradient(circle at 85% 40%, #ff2a6d55 0%, transparent 65%),
-    radial-gradient(circle at 70% 88%, #6c00ff55 0%, transparent 65%),
-    #080010;
-}
+  <!-- Flaticon UIcons CDN -->
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-solid-straight/css/uicons-solid-straight.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-straight/css/uicons-regular-straight.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-bold-rounded/css/uicons-bold-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-bold-straight/css/uicons-bold-straight.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-thin-straight/css/uicons-thin-straight.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-thin-rounded/css/uicons-thin-rounded.css">
 
-/* ---------- Theme / Global CSS ---------- */
-:root{
-  --glass: rgba(255,255,255,0.06);
-  --glass-strong: rgba(255,255,255,0.12);
-  --text: #e9ecff;
-  --muted: #b7c0d3;
-  --brand: #ff7a00;
-  --button: #1b1436;
-  --card-border: rgba(255,255,255,0.12);
-  --line: rgba(0,132,255,0.45);
-  --sleek-glow: 0 0 10px rgba(255,44,44,0.65), 0 0 18px rgba(255,44,44,0.45);
-  --tabActive: rgba(255,44,44,0.8);
-  --scrim: rgba(0,0,0,.45);
-  --soft-red: rgba(255,44,44,.18);
-  --soft-green: rgba(20,200,120,.18);
-  --tab-bg: rgba(255,150,70,0.18); /* NEW soft transparent glass orange */
-}
-body.light{
-  --text:#0b1230;
-  --muted:#5b6786;
-  --glass: rgba(255,255,255,0.6);
-  --card-border: rgba(0,0,0,0.08);
-  --button:#ffffff;
-  --line: rgba(0,0,0,0.12);
-  --scrim: rgba(0,0,0,.25);
-  --soft-red: rgba(255,44,44,.25);
-  --soft-green: rgba(20,200,120,.25);
-}
+  <style>
+    :root {
+      --bg: #ffffff;            /* default light background */
+      --card: #f5f5f7;
+      --text: #0a0a0a;
+      --muted: #6b7280;
+      --accent: #A855F7;        /* neon purple accent */
+      --accent-soft: rgba(168,85,247,0.12);
+      --nav-height: 78px;
+    }
 
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:"Poppins",sans-serif;
-  color:var(--text);
-  overflow-x:hidden;
-}
+    /* dark mode variables (toggle body.dark-mode) */
+    .dark-mode {
+      --bg: #080010;
+      --card: #0c0e1a;
+      --text: #e9ecff;
+      --muted: #b7c0d3;
+    }
 
-/* Page wrapper */
-.page{
-  min-height:100vh;
-  padding:14px 14px 92px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
+    html,body {
+      height:100%;
+      margin:0;
+      font-family:'Poppins',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
 
-/* Top-right buttons */
-.topbar{
-  display:flex;justify-content:flex-end;gap:10px;margin-bottom:6px;
-}
-.icon-btn{
-  width:38px;height:38px;border-radius:12px;
-  background:var(--glass);
-  border:1px solid var(--card-border);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;backdrop-filter:blur(8px);
-}
-.icon-btn svg{width:20px;height:20px;stroke:var(--text)}
+    /* layout: header + scrollable main + fixed footer */
+    .page {
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
 
-/* Header (avatar + welcome + tier) */
-.header{
-  display:flex;align-items:center;justify-content:space-between;
-  background:var(--glass);
-  border:1px solid var(--card-border);
-  border-radius:18px;
-  padding:12px 14px;
-  backdrop-filter: blur(10px);
-}
-.header-left{display:flex;align-items:center;gap:10px}
-.header-left img{width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,122,0,0.55)}
-.header-info .greet{font-weight:600;font-size:1.1rem}
-.header-info .tier{font-size:.9rem;color:var(--muted)}
-.badge{
-  padding:6px 12px;border-radius:12px;background:linear-gradient(90deg,#ff7a00,#ffb14a);
-  color:#1b1436;font-weight:800;font-size:.85rem;
-}
+    /* topbar (not fixed) */
+    .topbar {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:14px 18px;
+      gap:12px;
+    }
+    .brand { font-weight:700; font-size:1.05rem; }
 
-/* Card */
-.card{
-  background:var(--glass);
-  border:1px solid var(--card-border);
-  border-radius:20px;
-  padding:14px;
-  backdrop-filter:blur(12px);
-}
+    .top-controls { display:flex; gap:12px; align-items:center; }
+    .icon-btn {
+      width:44px; height:44px; border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      background:var(--card); border:1px solid rgba(0,0,0,0.04);
+      cursor:pointer; box-shadow: 0 6px 18px var(--accent-soft);
+    }
+    .icon-btn i { font-size:18px; color:var(--accent); }
 
-/* Wallet */
-.balance-head{
-  display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;
-}
-.balance-title{font-weight:700;font-size:1.2rem}
-.eye-btn{border:none;background:transparent;cursor:pointer}
-.balance-row{display:flex;align-items:baseline;gap:10px;margin:6px 0 8px}
-.balance-num{font-size:2rem;font-weight:800;letter-spacing:.3px}
-.wallet-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.chip{
-  border:1px solid var(--card-border);
-  background:rgba(255,255,255,0.04);
-  border-radius:12px;padding:6px 10px;font-size:.8rem;color:var(--muted)
-}
+    /* scrollable content area (takes remaining height minus footer) */
+    .main {
+      flex:1 1 auto;
+      overflow-y:auto;
+      padding:18px;
+      padding-bottom: calc(var(--nav-height) + 26px); /* leave space for fixed nav */
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
 
-/* Action Buttons */
-.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;text-align:center}
-.act{
-  background:rgba(10,10,22,0.55);
-  border:1px solid var(--card-border);
-  border-radius:16px;
-  padding:10px 6px;color:var(--text);
-  cursor:pointer;transition:.2s;
-}
-.act svg{width:26px;height:26px;stroke:var(--text);stroke-width:2.3}
-.act.active{box-shadow:var(--sleek-glow);border-color:rgba(255,44,44,0.9)}
+    /* header greeting */
+    .header {
+      padding:10px;
+      background:transparent;
+      text-align:left;
+    }
+    .greet { font-size:1.6rem; font-weight:700; margin:0 0 6px 0; }
+    .tagline { margin:0; color:var(--muted); font-size:0.95rem; }
 
-/* CTA */
-.cta{
-  width:100%;height:58px;border-radius:16px;border:0;cursor:pointer;margin-top:12px;
-  background:linear-gradient(90deg,#ff7a00,#ffb14a);
-  font-size:1.1rem;font-weight:800;color:#1b1436;
-}
+    /* actions (Hotel/Deals/Flights/Cars) */
+    .actions {
+      margin-top:8px;
+      display:flex;
+      gap:12px;
+      justify-content:space-between;
+    }
+    .action {
+      flex:1 1 0;
+      background:var(--card);
+      border-radius:14px;
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+      box-shadow: 0 10px 30px var(--accent-soft);
+      cursor:pointer;
+      min-width:0;
+    }
+    .action i { font-size:24px; color:var(--accent); }
+    .action label { font-size:0.95rem; color:var(--text); font-weight:600; }
 
-/* SidraFly Assistant */
-.section-title{margin:10px 2px 10px;font-weight:700;color:#dfe6ff}
-.ai-box{display:flex;gap:10px}
-.ai-input{
-  flex:1;height:48px;border-radius:12px;border:1px solid var(--card-border);
-  background:rgba(255,255,255,0.05);color:var(--text);padding:0 12px;
-}
-.ai-send{
-  width:54px;height:48px;border-radius:12px;border:0;background:var(--button);
-  display:flex;align-items:center;justify-content:center;cursor:pointer;
-}
-.ai-send svg{width:22px;height:22px;stroke:var(--text)}
+    /* popular destinations / placeholder grid */
+    .grid {
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+      margin-top:4px;
+    }
+    .card {
+      min-height:120px;
+      background:var(--card);
+      border-radius:12px;
+      padding:12px;
+      box-shadow: 0 8px 24px var(--accent-soft);
+    }
+    .card h4 { margin:0; font-size:1rem; }
+    .card p { margin:6px 0 0 0; color:var(--muted); font-size:0.85rem; }
 
-/* Smart Deals */
-.deals{display:grid;gap:10px}
-.deal{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:12px;border-radius:14px;border:1px solid var(--card-border);
-  background:rgba(255,255,255,0.04)
-}
+    /* fixed bottom nav */
+    .bottom-nav {
+      position:fixed;
+      left:0; right:0; bottom:12px;
+      display:flex;
+      justify-content:center;
+      pointer-events:none; /* allow inner .nav to handle clicks only */
+    }
+    .nav {
+      pointer-events:auto;
+      width:calc(100% - 28px);
+      max-width:980px;
+      height:var(--nav-height);
+      background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.98));
+      border-radius:16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-around;
+      padding:8px 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+      border:1px solid rgba(0,0,0,0.04);
+    }
+    .nav .item {
+      flex:1 1 0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      color:var(--muted);
+      font-size:0.85rem;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .18s, color .18s;
+    }
+    .nav .item i { font-size:20px; display:block; }
+    .nav .item.active {
+      color:var(--accent);
+      transform: translateY(-6px);
+      text-shadow: var(--accent-glow);
+    }
 
-/* Bottom navigation updated (soft orange bubble) */
-.tabbar{
-  position:fixed;left:0;right:0;bottom:0;
-  height:72px;padding:8px 10px;
-  background:rgba(10,10,22,0.55);backdrop-filter:blur(14px);
-  display:grid;grid-template-columns:repeat(5,1fr);gap:8px;
-}
-.tab{
-  border-radius:14px;
-  background:var(--tab-bg);
-  border:1px solid transparent;
-  color:#ffffff;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:4px;font-size:.72rem;cursor:pointer;transition:.2s;
-}
-.tab svg{width:20px;height:20px;stroke:#ffffff}
-.tab.active{border-color:var(--tabActive);box-shadow:var(--sleek-glow)}
+    /* responsive tweaks */
+    @media (min-width:720px) {
+      .greet { font-size:2rem; }
+      .action { padding:18px; }
+    }
 
-/* Panels */
-.panel{display:none;gap:14px;flex-direction:column}
-.panel.active{display:flex}
-
-/* Overlay scrim */
-.scrim{
-  position:fixed;inset:0;background:var(--scrim);opacity:0;pointer-events:none;transition:.2s;z-index:19;
-}
-.scrim.show{opacity:1;pointer-events:auto}
-
-/* Drawer / menu */
-.drawer{
-  position:fixed;top:0;right:-320px;width:310px;height:100vh;z-index:20;
-  background:rgba(12,14,30,.92);backdrop-filter:blur(12px);
-  border-left:1px solid var(--card-border);
-  transition:right .28s ease;padding:18px;overflow-y:auto;
-}
-.drawer.open{right:0}
-
-.drawer-close{
-  position:absolute;top:16px;right:16px;width:36px;height:36px;
-  border-radius:12px;border:1px solid rgba(255,44,44,.45);
-  background:var(--soft-red);display:flex;align-items:center;justify-content:center;
-}
-.drawer-close svg{width:18px;height:18px;stroke:#ff6b6b}
-
-/* Menu items */
-.menu-item{
-  display:flex;align-items:center;gap:12px;
-  padding:12px;border-radius:14px;
-  background:rgba(255,255,255,0.05);
-  border:1px solid var(--card-border);
-  cursor:pointer;margin-bottom:6px;
-}
-.menu-item svg{width:20px;height:20px;stroke:var(--text)}
-
-.menu-divider{
-  width:100%;height:1px;margin:12px 0;
-  background:rgba(255,255,255,0.12);
-  border-radius:10px;
-}
-.logout{
-  background:var(--soft-red)!important;border-color:rgba(255,44,44,.4)!important;
-  color:#ff8a8a!important;font-weight:700;
-}
-
-/* Notification Popup */
-.notif{
-  position:fixed;top:72px;right:14px;width:min(92vw,360px);
-  background:rgba(18,20,38,.95);backdrop-filter:blur(12px);
-  border:1px solid var(--card-border);border-radius:16px;padding:12px;
-  display:none;z-index:22;
-}
-.notif.show{display:block}
-.notif-close{
-  width:32px;height:32px;border-radius:10px;
-  border:1px solid rgba(255,44,44,.35);
-  background:var(--soft-red);display:flex;align-items:center;justify-content:center;
-}
-.notif-close svg{width:16px;height:16px;stroke:#ff6b6b}
-.n-card{
-  border:1px solid var(--card-border);
-  border-radius:14px;padding:10px;background:rgba(255,255,255,.04);margin-bottom:10px
-}
-.n-foot{margin-top:8px;border-top:1px dashed rgba(255,255,255,.2);padding-top:6px}
-.notif-actions{display:flex;gap:8px;margin-top:10px}
-.btn-soft{flex:1;height:40px;border-radius:10px;font-weight:700;border:1px solid transparent}
-.btn-green{background:var(--soft-green);color:#b9ffd9}
-.btn-red{background:var(--soft-red);color:#ffb9b9}
-</style>
+  </style>
 </head>
 <body>
-
-<canvas id="bgCanvas"></canvas>
-<div class="bg-glow"></div>
-<div class="scrim" id="scrim"></div>
-
-<div class="page">
-
-  <!-- Top buttons -->
-  <div class="topbar">
-    <button class="icon-btn" id="themeBtn">
-      <svg viewBox="0 0 24 24" stroke-width="2"><path id="themeIcon" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-    </button>
-
-    <button class="icon-btn" id="bellBtn">
-      <svg viewBox="0 0 24 24" stroke-width="2"><path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5"/><path d="M9 17a3 3 0 006 0"/></svg>
-    </button>
-
-    <button class="icon-btn" id="menuBtn">
-      <svg viewBox="0 0 24 24" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-    </button>
-  </div>
-
-  <!-- Header -->
-  <div class="header">
-    <div class="header-left">
-      <img src="sidrafly-logo.png">
-      <div class="header-info">
-        <div class="greet">Welcome back, <span id="userName">Captain</span></div>
-        <div class="tier">Sidra Miles • <span style="color:var(--brand)">1250</span></div>
-      </div>
-    </div>
-    <span class="badge">Captain</span>
-  </div>
-
-  <!-- HOME PANEL -->
-  <div id="panel-home" class="panel active">
-
-    <!-- Wallet -->
-    <div class="card">
-      <div class="balance-head">
-        <div class="balance-title">Est. total value</div>
-        <button class="eye-btn" id="eyeBtn">
-          <svg id="eyeIcon" viewBox="0 0 24 24" stroke-width="2">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-            <circle cx="12" cy="12" r="3"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="balance-row">
-        <div class="balance-num" id="balanceNum">$1,245.67</div>
-        <div class="balance-curr">USD</div>
-      </div>
-
-      <div class="wallet-badges">
-        <span class="chip">SDFL</span> <span class="chip">SDA</span> <span class="chip">TON</span>
-        <span class="chip">SOL</span> <span class="chip">BNB</span> <span class="chip">NEAR</span>
-        <span class="chip">TRON</span> <span class="chip">ETH</span>
-      </div>
-
-      <!-- OKX Outline Icons -->
-      <div class="actions">
-        <!-- Deposit -->
-        <button class="act">
-          <svg><circle cx="12" cy="12" r="9"/><path d="M12 7v8M12 15l-3-3M12 15l3-3"/></svg>
-          <small>Deposit</small>
-        </button>
-
-        <!-- Withdraw -->
-        <button class="act">
-          <svg><circle cx="12" cy="12" r="9"/><path d="M12 17V9M12 9l-3 3M12 9l3 3"/></svg>
-          <small>Withdraw</small>
-        </button>
-
-        <!-- Pay (transfer) -->
-        <button class="act">
-          <svg><path d="M16 8H3M16 8l-3-3M16 8l-3 3"/><path d="M8 16h13M8 16l3-3M8 16l3 3"/></svg>
-          <small>Pay</small>
-        </button>
-
-        <!-- History -->
-        <button class="act">
-          <svg><rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="15" cy="15" r="3.5"/><path d="M15 13.5V15l1.2 1.2"/></svg>
-          <small>History</small>
-        </button>
+  <div class="page">
+    <!-- topbar -->
+    <div class="topbar">
+      <div class="brand">SidraFly</div>
+      <div class="top-controls">
+        <div class="icon-btn" id="themeBtn" title="Toggle theme" onclick="toggleTheme()"><i class="fi fi-sr-brightness"></i></div>
+        <div class="icon-btn" id="bellBtn" title="Notifications"><i class="fi fi-rr-bell"></i></div>
+        <div class="icon-btn" id="menuBtn" title="Menu"><i class="fi fi-rr-menu-burger"></i></div>
       </div>
     </div>
 
-    <button class="cta">BOOK FLIGHT</button>
+    <!-- scrollable content -->
+    <main class="main" id="mainScroll">
+      <section class="header">
+        <h1 class="greet">Assalamualaikum, <span id="username">Guest</span></h1>
+        <p class="tagline">SidraFly — Your Digital Travel Friend.</p>
+      </section>
 
-    <!-- SidraFly Assistant -->
-    <div class="card">
-      <div class="section-title">SidraFly Assistant</div>
-      <div class="ai-box">
-        <input class="ai-input" placeholder="Ask: 'Find cheapest KHI → DXB this week'"/>
-        <button class="ai-send"><svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
-      </div>
-    </div>
+      <section class="actions" aria-label="quick actions">
+        <div class="action" data-action="hotel">
+          <i class="fi fi-ss-house-building"></i>
+          <label>Hotel</label>
+        </div>
+        <div class="action" data-action="deals">
+          <i class="fi fi-rs-badge-percent"></i>
+          <label>Deals</label>
+        </div>
+        <div class="action" data-action="flights">
+          <i class="fi fi-rr-plane-alt"></i>
+          <label>Flights</label>
+        </div>
+        <div class="action" data-action="cars">
+          <i class="fi fi-rr-luggage-cart"></i>
+          <label>Cars</label>
+        </div>
+      </section>
 
-    <!-- Deals -->
-    <div class="card">
-      <div class="section-title">Smart Deals for you</div>
-      <div class="deals">
-        <div class="deal"><strong>KHI → DXB</strong><small>Fri • from $139</small></div>
-        <div class="deal"><strong>ISB → IST</strong><small>Next week • from $199</small></div>
-        <div class="deal"><strong>LHE → DOH</strong><small>Weekend • from $179</small></div>
-      </div>
-    </div>
+      <section>
+        <h3 style="margin:12px 0 8px 0; color:var(--text)">Popular Destinations</h3>
+        <div class="grid" id="destGrid">
+          <!-- placeholder cards -->
+          <div class="card"><h4>Dubai</h4><p>2522 properties</p></div>
+          <div class="card"><h4>Paris</h4><p>2474 properties</p></div>
+          <div class="card"><h4>Hong Kong</h4><p>0 properties</p></div>
+          <div class="card"><h4>London</h4><p>3917 properties</p></div>
+        </div>
+      </section>
 
-  </div>
+      <!-- extra space so content can scroll above fixed nav -->
+      <div style="height:36px"></div>
+    </main>
 
-  <!-- FLIGHTS PANEL -->
-  <div id="panel-flights" class="panel">
-    <div class="card">
-      <div class="section-title">Search Flights</div>
-      <div class="ai-box">
-        <input class="ai-input" placeholder="From (e.g., KHI)"/>
-        <input class="ai-input" placeholder="To (e.g., DXB)"/>
-      </div>
-      <div class="ai-box">
-        <input class="ai-input" placeholder="Depart"/>
-        <input class="ai-input" placeholder="Return"/>
-      </div>
-      <button class="cta">Search</button>
-    </div>
-  </div>
-
-  <!-- BOOKINGS PANEL -->
-  <div id="panel-bookings" class="panel">
-    <div class="card">
-      <div class="section-title">Your Bookings</div>
-      <div class="deal"><strong>DXB → KHI</strong><small>Nov 12 • Confirmed</small></div>
-    </div>
-  </div>
-
-  <!-- WALLET PANEL -->
-  <div id="panel-wallet" class="panel">
-    <div class="card">
-      <div class="section-title">Wallet (Detailed)</div>
-      <div class="deal"><strong>SDFL</strong><small>12,500 • $1,020</small></div>
-      <div class="deal"><strong>SDA</strong><small>8,000 • $260</small></div>
-      <div class="deal"><strong>ETH</strong><small>0.42 • $1,300</small></div>
-    </div>
-  </div>
-
-  <!-- AI PANEL -->
-  <div id="panel-ai" class="panel">
-    <div class="card">
-      <div class="section-title">Sidra AI</div>
-      <div class="ai-box">
-        <input class="ai-input" placeholder="Ask anything…"/>
-        <button class="ai-send"><svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
-      </div>
+    <!-- fixed bottom nav (locked) -->
+    <div class="bottom-nav" aria-hidden="false">
+      <nav class="nav" role="navigation" aria-label="Main navigation">
+        <div class="item active" data-tab="home" id="tab-home">
+          <i class="fi fi-rs-home"></i>
+          <span>Home</span>
+        </div>
+        <div class="item" data-tab="flights" id="tab-flights">
+          <i class="fi fi-rr-plane-alt"></i>
+          <span>Flights</span>
+        </div>
+        <div class="item" data-tab="bookings" id="tab-bookings">
+          <i class="fi fi-rr-memo-pad"></i>
+          <span>Bookings</span>
+        </div>
+        <div class="item" data-tab="wallet" id="tab-wallet">
+          <i class="fi fi-rr-wallet"></i>
+          <span>Wallet</span>
+        </div>
+      </nav>
     </div>
   </div>
 
-</div>
+  <script>
+    // toggle theme (light/dark)
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+      // update theme icon (optional) - simple swap: brightness <-> moon (not implemented to change icon here)
+    }
 
-<!-- Bottom Navigation -->
-<nav class="tabbar">
-  <button class="tab active" data-panel="panel-home"><svg><path d="M3 10l9-7 9 7"/><path d="M9 22V12h6v10"/></svg><span>Home</span></button>
-  <button class="tab" data-panel="panel-flights"><svg><path d="M10.5 7L9 2l2 .5L14 7l7 5-2 1-7-2-2 6-2-1 1.5-5L3 9l2-1 5.5-1z"/></svg><span>Flights</span></button>
-  <button class="tab" data-panel="panel-bookings"><svg><rect x="3" y="5" width="18" height="16"/><path d="M7 13h10"/></svg><span>Bookings</span></button>
-  <button class="tab" data-panel="panel-wallet"><svg><rect x="3" y="6" width="18" height="12" rx="2"/></svg><span>Wallet</span></button>
-  <button class="tab" data-panel="panel-ai"><svg><circle cx="12" cy="12" r="4"/></svg><span>AI</span></button>
-</nav>
+    // set username from localStorage or default (wired to your auth later)
+    (function loadUsername(){
+      const uname = localStorage.getItem('sidrafly_username') || 'Guest';
+      document.getElementById('username').innerText = uname;
+    })();
 
-<!-- Drawer -->
-<aside class="drawer" id="drawer">
-  <button class="drawer-close" id="drawerClose">
-    <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
-  </button>
+    // Bottom nav behavior: lock in place and switch active class
+    const navItems = document.querySelectorAll('.nav .item');
+    navItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        navItems.forEach(i=>i.classList.remove('active'));
+        item.classList.add('active');
 
-  <div style="text-align:center;margin-top:40px;">
-    <img src="sidrafly-logo.png" style="width:78px;height:78px;border-radius:20px;border:2px solid rgba(255,122,0,0.6);padding:6px;background:rgba(255,255,255,0.05);">
-    <div style="margin-top:6px;font-size:1rem;font-weight:600;">Muhammad Nisar Afridi</div>
-  </div>
+        // small demo behaviour: scroll to top when Home clicked
+        const tab = item.dataset.tab;
+        if(tab === 'home') {
+          document.getElementById('mainScroll').scrollTo({ top: 0, behavior: 'smooth' });
+        } else if(tab === 'flights') {
+          // placeholder: scroll to flights section or open flights page
+          alert('Open Flights (placeholder)');
+        } else if(tab === 'bookings') {
+          alert('Open Bookings (placeholder)');
+        } else if(tab === 'wallet') {
+          alert('Open Wallet (placeholder)');
+        }
+      });
+    });
 
-  <div class="menu-divider"></div>
+    // keep bottom nav visible when keyboard opens on mobile (no auto reposition)
+    // (no changes needed here in most browsers; added to ensure nav remains fixed)
+    window.addEventListener('resize', () => {
+      // ensure content bottom padding remains equal to nav height
+      const nav = document.querySelector('.nav');
+      if(nav) {
+        const navHeight = nav.getBoundingClientRect().height;
+        document.querySelector('.main').style.paddingBottom = `${navHeight + 26}px`;
+      }
+    });
 
-  <div class="menu-item"><svg><path d="M3 10l9-7 9 7"/></svg>Home</div>
-  <div class="menu-item"><svg><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg>Profile</div>
-  <div class="menu-item"><svg><rect x="3" y="6" width="18" height="12" rx="2"/></svg>Wallet</div>
-  <div class="menu-item"><svg><path d="M12 1v4M12 19v4"/><circle cx="12" cy="12" r="4"/></svg>Support</div>
-  <div class="menu-item"><svg><path d="M10.5 7L9 2l2 .5L14 7l7 5"/></svg>Book a Flight</div>
-  <div class="menu-item"><svg><rect x="3" y="5" width="18" height="16"/></svg>My Bookings</div>
-
-  <div class="menu-divider"></div>
-
-  <div class="menu-item"><svg><path d="M16 3l5 5-5 5"/></svg>Invite & Earn</div>
-  <div class="menu-item"><svg><rect x="4" y="4" width="16" height="6"/><rect x="4" y="14" width="10" height="6"/></svg>Deals & Offers</div>
-  <div class="menu-item"><svg><circle cx="12" cy="12" r="4"/></svg>Reward Points</div>
-  <div class="menu-item"><svg><path d="M12 2L2 7l10 5 10-5z"/></svg>Popular Destinations</div>
-  <div class="menu-item"><svg><path d="M4 12h16M12 4v16"/></svg>Language & Currency</div>
-
-  <div class="menu-divider"></div>
-
-  <div class="menu-item logout"><svg><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>Logout</div>
-</aside>
-
-<!-- Notifications Popup -->
-<section class="notif" id="notif">
-  <div class="notif-head" style="display:flex;justify-content:space-between;">
-    <h4>Notifications</h4>
-    <button class="notif-close" id="notifClose"><svg><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-  </div>
-
-  <div>You have <strong>5</strong> unread notifications</div>
-
-  <div class="notif-list">
-    <div class="n-card">
-      <div><strong>🔔 New Account Login Detected</strong></div>
-      <div>Your account was accessed from a new device<br>Country: Pakistan 🇵🇰</div>
-      <div class="n-foot">If this wasn't you, secure your account immediately.</div>
-    </div>
-  </div>
-
-  <div class="notif-actions">
-    <button class="btn-soft btn-green" id="markRead">Mark all read</button>
-    <button class="btn-soft btn-red" id="clearAll">Clear all</button>
-  </div>
-</section>
-
-<script>
-
-/* Particle background */
-const c = document.getElementById('bgCanvas');
-const ctx = c.getContext('2d');
-function resize(){c.width = innerWidth; c.height = innerHeight;}
-resize(); addEventListener('resize',resize);
-let P = Array.from({length:60},()=>({
-  x:Math.random()*c.width,y:Math.random()*c.height,
-  r:Math.random()*2+1,dx:(Math.random()-.5)*.35,dy:(Math.random()-.5)*.35
-}));
-(function loop(){
-  ctx.clearRect(0,0,c.width,c.height);
-  P.forEach(p=>{
-    ctx.beginPath();ctx.fillStyle="rgba(255,255,255,.5)";
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
-    p.x+=p.dx;p.y+=p.dy;
-    if(p.x<0||p.x>c.width)p.dx*=-1;
-    if(p.y<0||p.y>c.height)p.dy*=-1;
-  });
-  requestAnimationFrame(loop);
-})();
-
-/* Panel switching */
-document.querySelectorAll('.tab').forEach(t=>{
-  t.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-    document.getElementById(t.dataset.panel).classList.add('active');
-  });
-});
-
-/* Drawer */
-const drawer=document.getElementById('drawer');
-const scrim=document.getElementById('scrim');
-document.getElementById('menuBtn').onclick=()=>{drawer.classList.add('open');scrim.classList.add('show');}
-document.getElementById('drawerClose').onclick=()=>{drawer.classList.remove('open');scrim.classList.remove('show');}
-scrim.onclick=()=>{drawer.classList.remove('open');scrim.classList.remove('show');}
-
-/* Notification popup */
-document.getElementById('bellBtn').onclick=()=>{notif.classList.toggle('show');}
-document.getElementById('notifClose').onclick=()=>{notif.classList.remove('show');}
-
-/* Balance hide */
-const eye=document.getElementById('eyeBtn'); const bn=document.getElementById('balanceNum');
-let hide=false;
-eye.onclick=()=>{hide=!hide;bn.innerText=hide ? "******" : "$1,245.67";}
-
-/* Theme */
-document.getElementById('themeBtn').onclick=()=>{
-  document.body.classList.toggle("light");
-};
-
-</script>
+    // optional: initialize padding once
+    window.dispatchEvent(new Event('resize'));
+  </script>
 </body>
 </html>
