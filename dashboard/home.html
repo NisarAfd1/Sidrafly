@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SidraFly — Home</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
+
+<style>
+  /* === THEME COLORS === */
+  :root {
+    --accent: #b376ff;
+    --bg: #ffffff;
+    --text: #111;
+    --muted: #6b7280;
+    --card: #f5f5f7;
+    --glass-border: rgba(0,0,0,0.1);
+  }
+
+  body.dark {
+    --accent: #b376ff;
+    --bg: radial-gradient(circle at 50% 20%, #120021 0%, #050009 100%);
+    --text: #f0eaff;
+    --muted: #b3a9c8;
+    --card: rgba(26, 12, 45, 0.7);
+    --glass-border: rgba(179, 118, 255, 0.3);
+  }
+
+  html, body {
+    margin: 0; padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.4s, color 0.4s;
+    min-height: 100vh;
+  }
+
+  /* === TOP BAR === */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: var(--card);
+    border-bottom: 1px solid var(--glass-border);
+    height: 70px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+  }
+
+  body.dark .topbar {
+    background: rgba(26, 12, 45, 0.8);
+    box-shadow: 0 0 20px rgba(179, 118, 255, 0.15);
+  }
+
+  .logo {
+    font-weight: 700; font-size: 1.3rem;
+    color: var(--accent);
+  }
+
+  .top-icons button {
+    background: var(--card);
+    border: none;
+    border-radius: 12px;
+    width: 40px; height: 40px;
+    margin-left: 10px;
+    cursor: pointer;
+    color: var(--accent);
+    font-size: 18px;
+  }
+
+  body.dark .top-icons button {
+    background: rgba(26, 12, 45, 0.8);
+    box-shadow: 0 0 10px rgba(179, 118, 255, 0.2);
+  }
+
+  /* === MENU DRAWER === */
+  #menuDrawer {
+    position: fixed;
+    top: 0; right: -100%;
+    width: 75%; max-width: 340px; height: 100%;
+    background: var(--card);
+    backdrop-filter: blur(16px);
+    box-shadow: -6px 0 20px rgba(0,0,0,0.25);
+    border-left: 1px solid var(--glass-border);
+    transition: right 0.35s ease;
+    z-index: 1100;
+    overflow-y: auto;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+  }
+  #menuDrawer.open { right: 0; }
+
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 1000;
+  }
+  .overlay.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .menu-header {
+    text-align: center;
+    padding: 60px 0 20px;
+  }
+  .menu-header img {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+  }
+  .menu-header h3 {
+    margin-top: 12px;
+    color: var(--text);
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.6;
+    margin: 16px auto;
+    width: 80%;
+    border-radius: 10px;
+  }
+
+  .menu-links {
+    display: flex;
+    flex-direction: column;
+    padding: 0 30px 30px;
+  }
+  .menu-links a {
+    color: var(--text);
+    text-decoration: none;
+    padding: 12px 0;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .menu-links a i { color: var(--accent); }
+  .menu-links a.logout {
+    color: crimson; font-weight: 600;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: crimson; color: #fff;
+    border: none; border-radius: 50%;
+    width: 36px; height: 36px;
+    font-size: 20px; cursor: pointer;
+  }
+
+  /* === MAIN CONTENT === */
+  main {
+    padding: 100px 20px 100px;
+  }
+  main h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  main p {
+    color: var(--muted);
+    margin-bottom: 30px;
+  }
+
+  /* === BOTTOM NAV === */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 70px;
+    background: var(--card);
+    border-top: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+  }
+  .bottom-nav a {
+    text-decoration: none;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+  .bottom-nav a.active, .bottom-nav a:hover {
+    color: var(--accent);
+  }
+  .bottom-nav i {
+    font-size: 22px;
+    margin-bottom: 3px;
+  }
+</style>
+</head>
+
+<body>
+  <!-- === TOP BAR === -->
+  <header class="topbar">
+    <h2 class="logo">SidraFly</h2>
+    <div class="top-icons">
+      <button id="themeToggle"><i class="fi fi-rr-brightness"></i></button>
+      <button><i class="fi fi-rr-bell"></i></button>
+      <button id="menuToggle"><i class="fi fi-rr-menu-burger"></i></button>
+    </div>
+  </header>
+
+  <!-- === MAIN CONTENT === -->
+  <main>
+    <h1>Assalamualaikum, Guest</h1>
+    <p>SidraFly — Your Digital Travel Friend.</p>
+  </main>
+
+  <!-- === MENU DRAWER === -->
+  <aside id="menuDrawer">
+    <button id="closeMenu" class="close-btn">&times;</button>
+    <div class="menu-header">
+      <img src="https://source.unsplash.com/100x100/?portrait" alt="User">
+      <h3>Muhammad Nisar</h3>
+    </div>
+
+    <div class="divider"></div>
+
+    <nav class="menu-links">
+      <a href="#"><i class="fi fi-rr-home"></i> Home</a>
+      <a href="#"><i class="fi fi-rr-settings"></i> Profile Settings</a>
+      <a href="#"><i class="fi fi-rr-gift"></i> Deals & Offers</a>
+      <a href="#"><i class="fi fi-rr-usd-circle"></i> Select Currency</a>
+
+      <div class="divider"></div>
+
+      <a href="#"><i class="fi fi-rc-headset"></i> Support</a>
+      <a href="#"><i class="fi fi-ss-medal"></i> Reward Points</a>
+      <a href="#"><i class="fi fi-rr-megaphone"></i> Invite & Earn</a>
+      <a href="#"><i class="fi fi-rr-english"></i> Language</a>
+
+      <div class="divider"></div>
+
+      <a href="auth.html" class="logout"><i class="fi fi-rr-sign-out"></i> Logout</a>
+    </nav>
+  </aside>
+
+  <div class="overlay" id="overlay"></div>
+
+  <!-- === BOTTOM NAVIGATION === -->
+  <div class="bottom-nav">
+    <a href="home.html" class="active"><i class="fi fi-rr-home"></i><span>Home</span></a>
+    <a href="flights.html"><i class="fi fi-rr-plane-alt"></i><span>Flights</span></a>
+    <a href="bookings.html"><i class="fi fi-rr-memo-pad"></i><span>Bookings</span></a>
+    <a href="wallet.html"><i class="fi fi-rr-wallet"></i><span>Wallet</span></a>
+  </div>
+
+  <script>
+    // Drawer controls
+    const menuBtn = document.getElementById('menuToggle');
+    const drawer = document.getElementById('menuDrawer');
+    const overlay = document.getElementById('overlay');
+    const closeMenu = document.getElementById('closeMenu');
+
+    menuBtn.addEventListener('click', () => {
+      drawer.classList.add('open');
+      overlay.classList.add('show');
+    });
+    closeMenu.addEventListener('click', () => {
+      drawer.classList.remove('open');
+      overlay.classList.remove('show');
+    });
+    overlay.addEventListener('click', () => {
+      drawer.classList.remove('open');
+      overlay.classList.remove('show');
+    });
+
+    // Theme toggle
+    const body = document.body;
+    const themeBtn = document.getElementById('themeToggle');
+    if (localStorage.getItem('sidraTheme') === 'dark') body.classList.add('dark');
+    themeBtn.addEventListener('click', () => {
+      body.classList.toggle('dark');
+      localStorage.setItem('sidraTheme', body.classList.contains('dark') ? 'dark' : 'light');
+    });
+  </script>
+</body>
+</html>

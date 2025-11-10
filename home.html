@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SidraFly — Home</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
+
+  <style>
+    :root {
+      --accent: #A855F7;
+      --bg: #fff;
+      --text: #111;
+      --muted: #777;
+      --card: #f5f5f7;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* === Fixed Topbar === */
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 56px; background: #fff; border-bottom: 1px solid #eee;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 16px; z-index: 1000;
+    }
+    .brand { font-weight: 600; font-size: 1.2rem; color: var(--accent); }
+    .top-controls i { font-size: 20px; color: var(--text); margin-left: 10px; }
+
+    /* === Scrollable Content === */
+    .content {
+      padding: 70px 16px 90px 16px;
+    }
+
+    h1 { font-size: 1.6rem; margin-bottom: 6px; }
+    p { color: var(--muted); margin-top: 0; font-size: 0.95rem; }
+
+    /* === Action Buttons === */
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 25px;
+      gap: 12px;
+    }
+    .action {
+      flex: 1;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      box-shadow: 0 4px 10px rgba(168,85,247,0.1);
+    }
+    .action:hover { transform: scale(1.05); }
+    .action i { font-size: 26px; color: var(--accent); display: block; margin-bottom: 8px; }
+    .action label { font-weight: 600; color: var(--text); font-size: 0.95rem; }
+
+    /* === Fixed Bottom Navigation === */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 70px;
+      background: #fff;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 1000;
+      box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+    }
+
+    .bottom-nav a {
+      text-decoration: none;
+      color: #777;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+
+    .bottom-nav a.active, .bottom-nav a:hover {
+      color: var(--accent);
+    }
+
+    .bottom-nav i {
+      font-size: 22px;
+      margin-bottom: 3px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="brand">SidraFly</div>
+    <div class="top-controls">
+      <i class="fi fi-rr-bell"></i>
+      <i class="fi fi-rr-menu-burger"></i>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <h1>Assalamualaikum, Traveler</h1>
+    <p>SidraFly — Your Digital Travel Friend.</p>
+
+    <div class="actions">
+      <div class="action" onclick="location.href='flights.html'">
+        <i class="fi fi-rr-plane-alt"></i>
+        <label>Flights</label>
+      </div>
+      <div class="action" onclick="location.href='bookings.html'">
+        <i class="fi fi-rr-memo-pad"></i>
+        <label>Bookings</label>
+      </div>
+      <div class="action" onclick="location.href='wallet.html'">
+        <i class="fi fi-rr-wallet"></i>
+        <label>Wallet</label>
+      </div>
+      <div class="action" onclick="location.href='home.html'">
+        <i class="fi fi-rr-home"></i>
+        <label>Home</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <a href="home.html" class="active">
+      <i class="fi fi-rr-home"></i><span>Home</span>
+    </a>
+    <a href="flights.html">
+      <i class="fi fi-rr-plane-alt"></i><span>Flights</span>
+    </a>
+    <a href="bookings.html">
+      <i class="fi fi-rr-memo-pad"></i><span>Bookings</span>
+    </a>
+    <a href="wallet.html">
+      <i class="fi fi-rr-wallet"></i><span>Wallet</span>
+    </a>
+  </div>
+
+</body>
+</html>

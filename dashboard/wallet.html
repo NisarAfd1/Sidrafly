@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SidraFly — Wallet</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
+
+  <style>
+    /* === THEME COLORS === */
+    :root {
+      --accent: #b376ff;
+      --bg: #ffffff;
+      --text: #111;
+      --muted: #6b7280;
+      --card: #f5f5f7;
+      --glass-border: rgba(0,0,0,0.1);
+    }
+
+    body.dark {
+      --accent: #b376ff;
+      --bg: radial-gradient(circle at 50% 20%, #120021 0%, #050009 100%);
+      --text: #f0eaff;
+      --muted: #b3a9c8;
+      --card: rgba(26, 12, 45, 0.7);
+      --glass-border: rgba(179, 118, 255, 0.3);
+    }
+
+    html, body {
+      margin: 0; padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.4s, color 0.4s;
+      min-height: 100vh;
+    }
+
+    /* === TOP BAR === */
+    .topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: var(--card);
+      border-bottom: 1px solid var(--glass-border);
+      height: 70px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+    body.dark .topbar {
+      background: rgba(26, 12, 45, 0.8);
+      box-shadow: 0 0 20px rgba(179, 118, 255, 0.15);
+    }
+    .logo {
+      font-weight: 700; font-size: 1.3rem;
+      color: var(--accent);
+    }
+    .top-icons button {
+      background: var(--card);
+      border: none;
+      border-radius: 12px;
+      width: 40px; height: 40px;
+      margin-left: 10px;
+      cursor: pointer;
+      color: var(--accent);
+      font-size: 18px;
+    }
+    body.dark .top-icons button {
+      background: rgba(26, 12, 45, 0.8);
+      box-shadow: 0 0 10px rgba(179, 118, 255, 0.2);
+    }
+
+    /* === MAIN CONTENT === */
+    main {
+      padding: 100px 20px 100px;
+    }
+    main h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    main p {
+      color: var(--muted);
+      margin-bottom: 30px;
+    }
+
+    /* === LOGOUT POPUP === */
+    #logoutPopup {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0,0,0,0.5);
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 2000;
+    }
+    #logoutPopup.show {
+      visibility: visible;
+      opacity: 1;
+    }
+    .popup-box {
+      background: var(--card);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 25px;
+      width: 85%;
+      max-width: 320px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+    .popup-box p {
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+    .popup-actions {
+      display: flex;
+      justify-content: space-around;
+    }
+    .popup-actions button {
+      padding: 10px 25px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      transition: opacity 0.2s ease;
+    }
+    .popup-actions button:hover {
+      opacity: 0.85;
+    }
+    .btn-yes {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-no {
+      background: crimson;
+      color: #fff;
+    }
+
+    /* === BOTTOM NAV === */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 70px;
+      background: var(--card);
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 1000;
+    }
+    .bottom-nav a {
+      text-decoration: none;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+    .bottom-nav a.active, .bottom-nav a:hover {
+      color: var(--accent);
+    }
+    .bottom-nav i {
+      font-size: 22px;
+      margin-bottom: 3px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- === TOP BAR === -->
+  <header class="topbar">
+    <h2 class="logo">SidraFly</h2>
+    <div class="top-icons">
+      <button id="themeToggle"><i class="fi fi-rr-brightness"></i></button>
+      <button><i class="fi fi-rr-bell"></i></button>
+      <button id="logoutBtn"><i class="fi fi-rr-sign-out-alt"></i></button>
+    </div>
+  </header>
+
+  <!-- === MAIN CONTENT === -->
+  <main>
+    <h1>Your Wallet 💰</h1>
+    <p>View your balance, recent transactions, and available travel credits.</p>
+  </main>
+
+  <!-- === LOGOUT POPUP === -->
+  <div id="logoutPopup">
+    <div class="popup-box">
+      <p>Are you sure you want to logout?</p>
+      <div class="popup-actions">
+        <button class="btn-yes" id="confirmLogout">Yes</button>
+        <button class="btn-no" id="cancelLogout">No</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === BOTTOM NAVIGATION === -->
+  <div class="bottom-nav">
+    <a href="home.html"><i class="fi fi-rr-home"></i><span>Home</span></a>
+    <a href="flights.html"><i class="fi fi-rr-plane-alt"></i><span>Flights</span></a>
+    <a href="bookings.html"><i class="fi fi-rr-memo-pad"></i><span>Bookings</span></a>
+    <a href="wallet.html" class="active"><i class="fi fi-rr-wallet"></i><span>Wallet</span></a>
+  </div>
+
+  <script>
+    // === THEME TOGGLE ===
+    const body = document.body;
+    const themeBtn = document.getElementById('themeToggle');
+    if (localStorage.getItem('sidraTheme') === 'dark') body.classList.add('dark');
+
+    themeBtn.addEventListener('click', () => {
+      body.classList.toggle('dark');
+      localStorage.setItem('sidraTheme', body.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    // === LOGOUT CONFIRMATION ===
+    const logoutBtn = document.getElementById('logoutBtn');
+    const logoutPopup = document.getElementById('logoutPopup');
+    const confirmLogout = document.getElementById('confirmLogout');
+    const cancelLogout = document.getElementById('cancelLogout');
+
+    logoutBtn.addEventListener('click', () => logoutPopup.classList.add('show'));
+    cancelLogout.addEventListener('click', () => logoutPopup.classList.remove('show'));
+    confirmLogout.addEventListener('click', () => {
+      logoutPopup.classList.remove('show');
+      window.location.href = 'authentication.html';
+    });
+  </script>
+</body>
+</html>

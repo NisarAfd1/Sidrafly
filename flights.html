@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SidraFly — Flights</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
+
+  <style>
+    :root {
+      --accent: #A855F7;
+      --bg: #fff;
+      --text: #111;
+      --muted: #777;
+      --card: #f5f5f7;
+      --divider: rgba(168,85,247,0.2);
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark {
+      --bg: #0a0013;
+      --text: #f5f5f7;
+      --muted: #bbb;
+      --card: #120020;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* === Topbar === */
+    .topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: var(--card);
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 16px;
+      z-index: 1000;
+    }
+    .brand {
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+    .top-controls i {
+      font-size: 20px;
+      color: var(--text);
+      margin-left: 16px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .top-controls i:hover { color: var(--accent); }
+
+    /* === Content === */
+    .content { padding: 70px 16px 90px; }
+    h1 { font-size: 1.6rem; margin-bottom: 6px; }
+    p { color: var(--muted); margin-top: 0; font-size: 0.95rem; }
+
+    /* === Flight Form === */
+    .flight-form {
+      background: var(--card);
+      padding: 18px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(168,85,247,0.1);
+    }
+    .flight-form input, .flight-form select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      margin-bottom: 12px;
+      font-size: 0.9rem;
+      background: #fff;
+    }
+    body.dark .flight-form input,
+    body.dark .flight-form select {
+      background: #1c1c2b;
+      color: var(--text);
+      border: 1px solid #333;
+    }
+    .flight-form button {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .flight-form button:hover { background: #922fee; }
+
+    /* === Bottom Nav === */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 70px;
+      background: var(--card);
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 1000;
+      box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+    }
+    .bottom-nav a {
+      text-decoration: none;
+      color: #777;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+    .bottom-nav a.active, .bottom-nav a:hover { color: var(--accent); }
+    .bottom-nav i { font-size: 22px; margin-bottom: 3px; }
+
+    /* === Menu Drawer === */
+    .menu-drawer {
+      position: fixed;
+      top: 0; right: -100%;
+      width: 70%;
+      max-width: 380px;
+      height: 100%;
+      background: var(--card);
+      box-shadow: -5px 0 20px rgba(0,0,0,0.2);
+      transition: right 0.3s ease;
+      z-index: 2000;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    .menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .menu-header img {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+    }
+    .menu-header button {
+      background: #ef4444;
+      border: none;
+      color: #fff;
+      border-radius: 50%;
+      width: 32px; height: 32px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .menu-divider {
+      height: 1px;
+      background: var(--divider);
+      margin: 10px 0;
+      box-shadow: 0 0 6px var(--divider);
+    }
+    .menu-links {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .menu-links a {
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .menu-links i {
+      font-size: 18px;
+      color: var(--accent);
+    }
+    .menu-links button {
+      background: transparent;
+      border: none;
+      color: #ef4444;
+      font-weight: 700;
+      text-align: left;
+      padding: 8px 0;
+      cursor: pointer;
+    }
+
+    /* === Overlay === */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      display: none;
+      z-index: 1500;
+    }
+    .overlay.active { display: block; }
+  </style>
+</head>
+
+<body>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="brand">SidraFly</div>
+    <div class="top-controls">
+      <i class="fi fi-rr-brightness" id="themeToggle"></i>
+      <i class="fi fi-rr-bell"></i>
+      <i class="fi fi-rr-menu-burger" id="menuToggle"></i>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <h1>Search Flights</h1>
+    <p>Find and book flights with SidraFly — Your Digital Travel Friend.</p>
+
+    <div class="flight-form">
+      <input type="text" placeholder="From (e.g. ISB)">
+      <input type="text" placeholder="To (e.g. DXB)">
+      <input type="date">
+      <select>
+        <option>Economy</option>
+        <option>Business</option>
+        <option>First Class</option>
+      </select>
+      <button>Search Flights</button>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <a href="home.html"><i class="fi fi-rr-home"></i><span>Home</span></a>
+    <a href="flights.html" class="active"><i class="fi fi-rr-plane-alt"></i><span>Flights</span></a>
+    <a href="bookings.html"><i class="fi fi-rr-memo-pad"></i><span>Bookings</span></a>
+    <a href="wallet.html"><i class="fi fi-rr-wallet"></i><span>Wallet</span></a>
+  </div>
+
+  <!-- Overlay -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Menu Drawer -->
+  <div class="menu-drawer" id="menuDrawer">
+    <div class="menu-header">
+      <img src="../sidrafly-logo.png" alt="User">
+      <button onclick="closeMenu()">×</button>
+    </div>
+
+    <div class="menu-links">
+      <a href="home.html"><i class="fi fi-rr-home"></i> Home</a>
+      <a href="flights.html"><i class="fi fi-rr-plane-alt"></i> Flights</a>
+      <a href="bookings.html"><i class="fi fi-rr-memo-pad"></i> Bookings</a>
+      <a href="wallet.html"><i class="fi fi-rr-wallet"></i> Wallet</a>
+      <div class="menu-divider"></div>
+      <a href="profile.html"><i class="fi fi-rr-user"></i> Profile Settings</a>
+      <a href="deals.html"><i class="fi fi-rr-badge-percent"></i> Deals & Offers</a>
+      <a href="currency.html"><i class="fi fi-sr-usd-circle"></i> Select Currency</a>
+      <div class="menu-divider"></div>
+      <a href="support.html"><i class="fi fi-rr-headset"></i> Support</a>
+      <a href="rewards.html"><i class="fi fi-rr-gift"></i> Reward Points</a>
+      <a href="invite.html"><i class="fi fi-rr-gift-box-benefits"></i> Invite & Earn</a>
+      <a href="language.html"><i class="fi fi-tr-language-exchange"></i> Language</a>
+      <div class="menu-divider"></div>
+      <button onclick="logoutConfirm()">Logout</button>
+    </div>
+  </div>
+
+  <script>
+    // Menu
+    const drawer = document.getElementById("menuDrawer");
+    const overlay = document.getElementById("overlay");
+    const menuToggle = document.getElementById("menuToggle");
+    const themeToggle = document.getElementById("themeToggle");
+
+    menuToggle.addEventListener("click", () => {
+      drawer.style.right = "0";
+      overlay.classList.add("active");
+    });
+
+    function closeMenu() {
+      drawer.style.right = "-100%";
+      overlay.classList.remove("active");
+    }
+
+    overlay.addEventListener("click", closeMenu);
+
+    function logoutConfirm() {
+      if (confirm("Are you sure you want to logout?")) {
+        window.location.href = "../auth.html";
+      }
+    }
+
+    // Day/Night mode toggle
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      themeToggle.classList.toggle("fi-rr-brightness");
+      themeToggle.classList.toggle("fi-rr-moon-stars");
+    });
+  </script>
+</body>
+</html>

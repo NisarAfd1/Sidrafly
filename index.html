@@ -1,7 +1,343 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="refresh" content="0; url=start.html" />
-  </head>
-<body></body>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SidraFly — Dashboard</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Flaticon UIcons CDN -->
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-solid-straight/css/uicons-solid-straight.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-straight/css/uicons-regular-straight.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-bold-rounded/css/uicons-bold-rounded.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-bold-straight/css/uicons-bold-straight.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-thin-straight/css/uicons-thin-straight.css">
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-thin-rounded/css/uicons-thin-rounded.css">
+
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #f5f5f7;
+      --text: #0a0a0a;
+      --muted: #6b7280;
+      --accent: #A855F7; /* neon purple */
+      --accent-soft: rgba(168,85,247,0.12);
+      --nav-height: 78px;
+    }
+
+    .dark-mode {
+      --bg: #080010;
+      --card: #0c0e1a;
+      --text: #e9ecff;
+      --muted: #b7c0d3;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* topbar */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      gap: 12px;
+    }
+    .brand { font-weight: 700; font-size: 1.05rem; }
+    .top-controls { display: flex; gap: 12px; align-items: center; }
+
+    .icon-btn {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--card);
+      border: 1px solid rgba(0,0,0,0.04);
+      cursor: pointer;
+      box-shadow: 0 6px 18px var(--accent-soft);
+    }
+    .icon-btn i { font-size: 18px; color: var(--accent); }
+
+    .main {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 18px;
+      padding-bottom: calc(var(--nav-height) + 26px);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* greeting */
+    .header {
+      padding: 10px;
+      text-align: left;
+    }
+    .greet { font-size: 1.6rem; font-weight: 700; margin: 0 0 6px 0; }
+    .tagline { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+    /* quick actions */
+    .actions {
+      margin-top: 8px;
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+    }
+    .action {
+      flex: 1 1 0;
+      background: var(--card);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 30px var(--accent-soft);
+      cursor: pointer;
+    }
+    .action i { font-size: 24px; color: var(--accent); }
+    .action label { font-size: 0.95rem; color: var(--text); font-weight: 600; }
+
+    /* 🌍 Popular Destinations */
+    .popular-destinations {
+      margin-top: 20px;
+      padding-bottom: 10px;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .section-header h2 {
+      font-size: 1.2rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-header .see-all {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .section-header .see-all:hover {
+      text-decoration: underline;
+    }
+
+    .destinations-scroll {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      padding: 4px;
+    }
+    .destinations-scroll::-webkit-scrollbar { display: none; }
+
+    .destination-card {
+      flex: 0 0 70%;
+      height: 180px;
+      border-radius: 16px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+      scroll-snap-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .destination-card:hover {
+      transform: scale(1.04);
+      box-shadow: 0 6px 20px rgba(168,85,247,0.25);
+    }
+    .destination-card .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.6), transparent 70%);
+    }
+    .destination-info {
+      position: absolute;
+      bottom: 10px;
+      left: 12px;
+      color: #fff;
+    }
+    .destination-info h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .destination-info p {
+      margin: 2px 0 0;
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    /* bottom nav */
+    .bottom-nav {
+      position: fixed;
+      left: 0; right: 0; bottom: 12px;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .nav {
+      pointer-events: auto;
+      width: calc(100% - 28px);
+      max-width: 980px;
+      height: var(--nav-height);
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 8px 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    .nav .item {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: transform .18s, color .18s;
+    }
+    .nav .item i { font-size: 20px; }
+    .nav .item.active {
+      color: var(--accent);
+      transform: translateY(-6px);
+    }
+
+    @media (min-width:720px) {
+      .greet { font-size: 2rem; }
+      .action { padding: 18px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div class="brand">SidraFly</div>
+      <div class="top-controls">
+        <div class="icon-btn" id="themeBtn" title="Toggle theme" onclick="toggleTheme()"><i class="fi fi-sr-brightness"></i></div>
+        <div class="icon-btn" id="bellBtn" title="Notifications"><i class="fi fi-rr-bell"></i></div>
+        <div class="icon-btn" id="menuBtn" title="Menu"><i class="fi fi-rr-menu-burger"></i></div>
+      </div>
+    </div>
+
+    <main class="main" id="mainScroll">
+      <section class="header">
+        <h1 class="greet">Assalamualaikum, <span id="username">Guest</span></h1>
+        <p class="tagline">SidraFly — Your Digital Travel Friend.</p>
+      </section>
+
+      <section class="actions" aria-label="quick actions">
+        <div class="action"><i class="fi fi-ss-house-building"></i><label>Hotel</label></div>
+        <div class="action"><i class="fi fi-rs-badge-percent"></i><label>Deals</label></div>
+        <div class="action"><i class="fi fi-rr-plane-alt"></i><label>Flights</label></div>
+        <div class="action"><i class="fi fi-rs-car-side"></i><label>Cars</label></div>
+      </section>
+
+      <!-- 🌍 Popular Destinations -->
+      <section class="popular-destinations">
+        <div class="section-header">
+          <h2><i class="fi fi-rr-plane-alt"></i> Popular Destinations</h2>
+          <a href="#" class="see-all">See All →</a>
+        </div>
+        <div class="destinations-scroll">
+         <!-- Mecca (Kaaba view) -->
+    <div class="destination-card" style="background-image:url('https://images.pexels.com/photos/17967284/pexels-photo-17967284.jpeg?auto=compress&cs=tinysrgb&w=800')">
+      <div class="overlay"></div>
+      <div class="destination-info"><h3>Makkah</h3><p>Saudi Arabia</p></div>
+    </div>
+
+          <div class="destination-card" style="background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=60')">
+            <div class="overlay"></div>
+            <div class="destination-info">
+              <h3>Dubai</h3>
+              <p>United Arab Emirates</p>
+            </div>
+          </div>
+        
+          <div class="destination-card" style="background-image:url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=60')">
+            <div class="overlay"></div>
+            <div class="destination-info">
+              <h3>Paris</h3>
+              <p>France</p>
+            </div>
+          </div>
+        
+          <div class="destination-card" style="background-image:url('https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=800&q=60')">
+            <div class="overlay"></div>
+            <div class="destination-info">
+              <h3>London</h3>
+              <p>United Kingdom</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div style="height:36px"></div>
+    </main>
+
+    <!-- fixed bottom nav -->
+    <div class="bottom-nav">
+      <nav class="nav">
+        <div class="item active"><i class="fi fi-rs-home"></i><span>Home</span></div>
+        <div class="item"><i class="fi fi-rr-plane-alt"></i><span>Flights</span></div>
+        <div class="item"><i class="fi fi-rr-memo-pad"></i><span>Bookings</span></div>
+        <div class="item"><i class="fi fi-rr-wallet"></i><span>Wallet</span></div>
+      </nav>
+    </div>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    (function loadUsername(){
+      const uname = localStorage.getItem('sidrafly_username') || 'Guest';
+      document.getElementById('username').innerText = uname;
+    })();
+
+    const navItems = document.querySelectorAll('.nav .item');
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        navItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+      });
+    });
+
+    window.addEventListener('resize', () => {
+      const nav = document.querySelector('.nav');
+      if (nav) {
+        const navHeight = nav.getBoundingClientRect().height;
+        document.querySelector('.main').style.paddingBottom = `${navHeight + 26}px`;
+      }
+    });
+    window.dispatchEvent(new Event('resize'));
+  </script>
+</body>
 </html>
